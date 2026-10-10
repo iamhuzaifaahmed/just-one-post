@@ -44,6 +44,7 @@ class HandleInertiaRequests extends Middleware
             'timezone' => config('social.display_timezone'),
             'platforms' => config('social.platforms'),
             'appName' => config('app.name'),
+            'pendingMigrations' => fn () => $request->user()?->is_admin ? \App\Http\Controllers\Admin\UpdateController::pending() : 0,
         ];
     }
 }

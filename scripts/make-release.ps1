@@ -45,6 +45,7 @@ foreach ($d in 'storage\logs', 'storage\framework\cache\data', 'storage\framewor
     New-Item -ItemType Directory -Force -Path $p | Out-Null
 }
 Remove-Item (Join-Path $stage 'public\storage') -Force -Recurse -ErrorAction SilentlyContinue   # local symlink
+Remove-Item (Join-Path $stage 'storage\app\installed.lock') -Force -ErrorAction SilentlyContinue   # the installer lock of THIS machine
 Remove-Item (Join-Path $stage 'public\hot') -Force -ErrorAction SilentlyContinue
 
 Write-Host "==> 3/4 Installing PHP dependencies (no dev packages)" -ForegroundColor Cyan

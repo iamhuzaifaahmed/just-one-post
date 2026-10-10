@@ -106,7 +106,7 @@ function Sidebar({ user, onNavigate }) {
 
 export default function AuthenticatedLayout({ header, children }) {
     const page = usePage();
-    const { auth, flash, impersonating } = page.props;
+    const { auth, flash, impersonating, pendingMigrations } = page.props;
     const url = page.url;
     const [open, setOpen] = useState(false);
 
@@ -151,6 +151,19 @@ export default function AuthenticatedLayout({ header, children }) {
                         </span>
                         <Link href={route('impersonate.stop')} method="post" as="button" className="rounded-lg bg-amber-950 px-3 py-1 text-xs font-semibold text-amber-50 hover:bg-amber-900">
                             Return to admin
+                        </Link>
+                    </div>
+                </div>
+            )}
+
+            {auth.user.is_admin && pendingMigrations > 0 && (
+                <div className="border-b border-brand/30 bg-brand/10 px-4 py-2.5 text-sm text-fg lg:ml-64">
+                    <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2">
+                        <span>
+                            <strong>Update available:</strong> a new version was uploaded and the database needs {pendingMigrations} update{pendingMigrations > 1 ? 's' : ''}.
+                        </span>
+                        <Link href={route('admin.update')} method="post" as="button" className="btn-primary btn-sm">
+                            Update database
                         </Link>
                     </div>
                 </div>

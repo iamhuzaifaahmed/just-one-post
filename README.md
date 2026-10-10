@@ -142,54 +142,44 @@ One Meta app covers both Facebook Pages and Instagram.
 
 ---
 
-## Deploying to cPanel (no Node.js on the server)
+## Deploying to cPanel (no terminal, no Node.js)
 
-The server only runs **PHP**. Node.js is used on *your own computer* to compile the React front end into `public/build`; nothing in production needs it, and all pages are bundled so there is no runtime JavaScript build or download step.
+The server only runs **PHP**. Node.js is used on *your own computer* to compile the React front end; nothing in production needs it, and all pages are bundled so there is no runtime build step.
 
-**Option A: release zip (recommended).** On your Windows computer (Node + Composer installed):
+### 1. Build the release zip (on your computer, once per version)
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/make-release.ps1
 ```
 
-This compiles the front end, installs PHP packages without dev tools, leaves out `.git`, `node_modules`, tests, `.env` and uploads, and writes `release/techlo-post-<date>.zip`. Upload it with cPanel → File Manager and *Extract* it to e.g. `/home/USER/techlo-post` (outside `public_html`).
+It compiles the front end, installs PHP packages without dev tools and writes `release/techlo-post-<date>.zip` (about 10 MB). It leaves out `.git`, `node_modules`, tests, `.env` and uploads. The zip contains everything the server needs, including `vendor/`.
 
-**Option B: git.** `public/build` is committed (the compiled front end), so `git pull` on the server (cPanel → *Git Version Control*) already contains it. You still need `vendor/`: run `composer install --no-dev --optimize-autoloader` in cPanel Terminal, or upload a `vendor.zip` built locally. Before pushing UI changes run `npm run build` and commit `public/build`.
+### 2. Upload and install (in cPanel + browser)
 
-Then, on the server:
+1. **File Manager** → upload the zip into the folder of your domain or subdomain → **Extract**.
+2. **MySQL Databases** → create a database and a user, then add the user to the database with **ALL PRIVILEGES**.
+3. **Open your site address in the browser.** The web installer appears (a server check, then four short sections). Enter the database details (or paste a `mysql://user:pass@host/db` URL), your site name, time zone and the admin account, then press **Install**. It writes the `.env` file with a fresh `APP_KEY`, creates the tables, creates your admin account and **locks itself**. You do not need SSH, Composer or Artisan.
+4. The last screen shows the **cron command**. In cPanel → **Cron Jobs** pick *Once Per Minute* and paste it (it looks like `* * * * * /usr/local/bin/php /home/USER/…/artisan schedule:run >> /dev/null 2>&1`; if the Cron Jobs page suggests another PHP path, use that one). The admin **Overview** page shows when the scheduler last ran and turns red if it stops.
+5. Log in with the admin account you just created. Done.
 
-1. **Document root → `/public`.** cPanel → *Domains*: set the domain's document root to `/home/USER/techlo-post/public`. (If you cannot change it, the root `.htaccess` forwards everything to `public/` and blocks `.env`, `vendor`, `storage` etc.)
-2. **PHP:** select PHP 8.2+ (MultiPHP Manager) with `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `curl`, `gd`. Raise `upload_max_filesize`/`post_max_size` (e.g. 512M) and `max_execution_time`/`memory_limit` for video uploads; adjust `UPLOAD_MAX_KB` in `.env`.
-3. **Database:** *MySQL Databases* → create a DB + user with all privileges.
-4. **`.env`:** copy `.env.example` to `.env` and set:
-   ```
-   APP_NAME="Techlo Post"
-   APP_ENV=production
-   APP_DEBUG=false
-   APP_URL=https://app.your-domain.com
-   DB_DATABASE=cpaneluser_dbname
-   DB_USERNAME=cpaneluser_dbuser
-   DB_PASSWORD=...
-   QUEUE_CONNECTION=database
-   SESSION_DRIVER=database
-   MAIL_*  (so password-reset e-mails work)
-   ```
-   Generate the key once: `php artisan key:generate --force`. **Back up `APP_KEY`**: tokens are encrypted with it and become unreadable if it changes.
-5. **Commands (cPanel Terminal or SSH):**
-   ```bash
-   cd /home/USER/techlo-post
-   php artisan migrate --force
-   php artisan storage:link
-   php artisan config:cache && php artisan route:cache
-   ```
-   If symlinks are disabled, ask the host to link `public/storage` → `storage/app/public`. Make sure `storage/` and `bootstrap/cache/` are writable (755/775).
-6. **Cron (cPanel → Cron Jobs)**, one entry, every minute (use the PHP CLI path your host shows, often `/usr/local/bin/php` or `/opt/cpanel/ea-php82/root/usr/bin/php`):
-   ```
-   * * * * * /usr/local/bin/php /home/USER/techlo-post/artisan schedule:run >> /dev/null 2>&1
-   ```
-   The admin **Overview** page shows when the scheduler last ran and turns red if it stopped.
-7. Open the site and register: **the first account becomes the admin**. Change the password if you used `db:seed`.
-8. **Updating later:** upload the new release zip over the old files (keep `.env` and `storage/`), then run `php artisan migrate --force && php artisan config:cache && php artisan route:cache`.
+Notes:
+
+* **Document root.** Best is to point the domain's document root at the `public` folder (cPanel → Domains). If you extracted straight into `public_html`, the bundled root `.htaccess` forwards every request to `public/` and blocks `.env`, `vendor`, `storage` and friends, so it works either way.
+* **PHP.** Choose PHP 8.2+ in *MultiPHP Manager*. The installer's server check lists any missing extension or non-writable folder and tells you what to change. For video uploads raise `upload_max_filesize`/`post_max_size` (e.g. 512M) in *MultiPHP INI Editor* and adjust `UPLOAD_MAX_KB` in `.env`.
+* **Install right away.** Until the installer has run, anyone who opens the address could run it. After it has run, it can never be started again (it is locked, and the installer file is not reachable from the web).
+* **Interrupted install?** Open the address again: the installer notices the half-finished attempt and continues (the existing `APP_KEY` is kept).
+* **Uploaded images** are served by the app itself when the `public/storage` symlink cannot be created on your host, so Instagram/Threads can still download them.
+* **Back up `.env`.** Its `APP_KEY` encrypts every connected-account token; lose it and users must reconnect.
+* **Mail.** Add the `MAIL_*` settings to `.env` if you want password-reset e-mails.
+
+### 3. Updating to a newer version
+
+1. Build a new zip, upload it and **Extract over the old files** (overwrite). Your `.env`, `storage/` and uploads are not in the zip, so they stay.
+2. Log in as admin. If the new version changes the database, a banner says **"Update available"**: press **Update database** (it runs the new migrations; no terminal needed).
+
+### Alternative: git + SSH
+
+`public/build` (the compiled front end) is committed, so `git pull` on the server already contains it. Run `composer install --no-dev --optimize-autoloader`, copy `.env.example` to `.env`, `php artisan key:generate`, `php artisan migrate --force`, `php artisan storage:link` and add the cron line above. Before pushing UI changes run `npm run build` and commit `public/build`.
 
 **Cron/queue behaviour on shared hosting:** `queue:work --stop-when-empty --max-time=50` starts each minute in the background, processes everything pending and exits. Several short-lived workers can overlap safely (the database queue reserves jobs atomically). `QUEUE_RETRY_AFTER` (default 1800 s) must exceed your longest upload so a slow video upload isn't picked up twice; even if it were, the idempotency checks prevent a double post. If your host kills long-running processes, large video uploads may fail – they'll be retried and eventually marked failed with the error shown.
 
