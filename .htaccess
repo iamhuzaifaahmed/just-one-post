@@ -1,0 +1,12 @@
+# Only used when the hosting's document root cannot be pointed at /public (some cPanel setups).
+# Preferred setup: set the domain's document root to the "public" folder and ignore this file.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Never serve dotfiles or framework folders from the project root.
+    RewriteRule ^(\.env|\.git|vendor|storage|bootstrap|config|database|routes|resources|tests|app)(/|$) - [F,L]
+
+    # Everything else goes to public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

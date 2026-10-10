@@ -11,20 +11,9 @@ use App\Http\Controllers\ManualConnectionController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
-use App\Models\User;
-use App\Services\AppSettings;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    if (auth()->check()) {
-        return redirect()->route('dashboard');
-    }
-
-    return Inertia::render('Welcome', [
-        'canRegister' => AppSettings::registrationOpen() || ! User::exists(),
-    ]);
-});
+Route::get('/', fn () => redirect()->route(auth()->check() ? 'dashboard' : 'login'));
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');

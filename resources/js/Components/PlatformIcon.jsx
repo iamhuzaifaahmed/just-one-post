@@ -82,10 +82,10 @@ export function PlatformStack({ targets }) {
     const ring = {
         published: 'ring-emerald-400',
         failed: 'ring-red-400',
-        cancelled: 'ring-slate-300 opacity-50',
+        cancelled: 'ring-line opacity-50',
         publishing: 'ring-amber-400',
-        queued: 'ring-indigo-300',
-        scheduled: 'ring-white',
+        queued: 'ring-brand/30',
+        scheduled: 'ring-panel',
     };
 
     return (
@@ -95,7 +95,7 @@ export function PlatformStack({ targets }) {
                     key={i}
                     platform={t.platform}
                     size="sm"
-                    className={'ring-2 ' + (ring[t.status] || 'ring-white')}
+                    className={'ring-2 ' + (ring[t.status] || 'ring-panel')}
                 />
             ))}
         </span>

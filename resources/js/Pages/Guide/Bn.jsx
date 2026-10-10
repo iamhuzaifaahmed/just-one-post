@@ -35,7 +35,7 @@ export function StartHereBn({ setTab }) {
             </Words>
 
             <div>
-                <h3 className="mb-3 font-semibold text-slate-900">প্রতিটি প্ল্যাটফর্মের জন্য ৩টি ধাপ</h3>
+                <h3 className="mb-3 font-semibold text-fg">প্রতিটি প্ল্যাটফর্মের জন্য ৩টি ধাপ</h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     {[
                         ['১', 'অ্যাপ বানান', 'প্ল্যাটফর্মের ডেভেলপার ওয়েবসাইটে। প্রতিটি ক্লিক এই গাইডে দেখানো আছে।'],
@@ -43,17 +43,17 @@ export function StartHereBn({ setTab }) {
                         ['৩', 'Connect চাপুন', 'নিজের অ্যাকাউন্টে লগইন করে Allow চাপুন। হয়ে গেল। আর করতে হবে না (শুধু LinkedIn প্রতি ~৬০ দিনে একবার)।'],
                     ].map(([n, t, d]) => (
                         <div key={n} className="card p-4">
-                            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white">{n}</span>
-                            <div className="mt-3 font-semibold text-slate-900">{t}</div>
-                            <p className="mt-1 text-sm text-slate-500">{d}</p>
+                            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-sm font-bold text-brand-fg">{n}</span>
+                            <div className="mt-3 font-semibold text-fg">{t}</div>
+                            <p className="mt-1 text-sm text-muted">{d}</p>
                         </div>
                     ))}
                 </div>
             </div>
 
             <div>
-                <h3 className="mb-3 font-semibold text-slate-900">আপনার যেটা দরকার সেটা বেছে নিন</h3>
-                <p className="mb-3 text-sm text-slate-500">সবকিছু সেটআপ করা বাধ্যতামূলক নয়। যে প্ল্যাটফর্মে পোস্ট করতে চান শুধু সেটাই করুন।</p>
+                <h3 className="mb-3 font-semibold text-fg">আপনার যেটা দরকার সেটা বেছে নিন</h3>
+                <p className="mb-3 text-sm text-muted">সবকিছু সেটআপ করা বাধ্যতামূলক নয়। যে প্ল্যাটফর্মে পোস্ট করতে চান শুধু সেটাই করুন।</p>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {[
                         ['linkedin', ['linkedin'], 'LinkedIn', 'আপনার নিজের প্রোফাইলে পোস্ট।', 'প্রায় ১৫ মিনিট'],
@@ -72,22 +72,22 @@ export function StartHereBn({ setTab }) {
                         >
                             <span className="flex -space-x-2">
                                 {icons.map((i) => (
-                                    <PlatformIcon key={i} platform={i} size="lg" className="ring-4 ring-white" />
+                                    <PlatformIcon key={i} platform={i} size="lg" className="ring-4 ring-panel" />
                                 ))}
                             </span>
                             <span className="min-w-0 flex-1">
-                                <span className="block font-semibold text-slate-900">{t}</span>
-                                <span className="block text-sm text-slate-500">{d}</span>
+                                <span className="block font-semibold text-fg">{t}</span>
+                                <span className="block text-sm text-muted">{d}</span>
                             </span>
-                            <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">{time}</span>
+                            <span className="shrink-0 rounded-full bg-soft px-2.5 py-1 text-xs font-medium text-muted">{time}</span>
                         </button>
                     ))}
                 </div>
             </div>
 
             <div>
-                <h3 className="mb-3 font-semibold text-slate-900">শুরুর আগে এগুলো হাতের কাছে রাখুন</h3>
-                <ul className="space-y-2 text-sm text-slate-700">
+                <h3 className="mb-3 font-semibold text-fg">শুরুর আগে এগুলো হাতের কাছে রাখুন</h3>
+                <ul className="space-y-2 text-sm text-fg/80">
                     {[
                         'যে অ্যাকাউন্টগুলোতে পোস্ট করতে চান, সেগুলোতে লগইন করার তথ্য (ইমেইল/পাসওয়ার্ড)।',
                         'পাশে ফোন রাখুন: কিছু সাইট লগইনের সময় SMS বা ইমেইলে কোড পাঠায়।',
@@ -266,7 +266,7 @@ export function MetaBn({ redirects }) {
                 </p>
             </Words>
 
-            <h3 className="font-semibold text-slate-900">ক অংশ: অ্যাকাউন্ট প্রস্তুত করুন</h3>
+            <h3 className="font-semibold text-fg">ক অংশ: অ্যাকাউন্ট প্রস্তুত করুন</h3>
             <Steps group="meta-a">
                 <Step title="একটা Facebook Page আছে কি না দেখুন">
                     <p>
@@ -301,7 +301,7 @@ export function MetaBn({ redirects }) {
                 </Step>
             </Steps>
 
-            <h3 className="pt-2 font-semibold text-slate-900">খ অংশ: Meta অ্যাপ বানান</h3>
+            <h3 className="pt-2 font-semibold text-fg">খ অংশ: Meta অ্যাপ বানান</h3>
             <Steps group="meta-b">
                 <Step title="Meta for Developers-এ গিয়ে রেজিস্টার করুন">
                     <p>
@@ -594,7 +594,7 @@ export function PublicBn({ isLocal, publicBaseUrl, appUrl }) {
                 </Callout>
             )}
 
-            <h3 className="font-semibold text-slate-900">উপায় ক (সবচেয়ে সহজ): ngrok নামের ফ্রি টানেল</h3>
+            <h3 className="font-semibold text-fg">উপায় ক (সবচেয়ে সহজ): ngrok নামের ফ্রি টানেল</h3>
             <Steps group="public">
                 <Step title="ফ্রি ngrok অ্যাকাউন্ট খুলে ইনস্টল করুন">
                     <p>
@@ -627,8 +627,7 @@ export function PublicBn({ isLocal, publicBaseUrl, appUrl }) {
                     <li>
                         ফ্রি প্ল্যানে ngrok ঠিকানা প্রতিবার রিস্টার্ট করলে <b>বদলে যায়</b>। প্রতিবার নতুনটা Settings-এ পেস্ট করতে হবে।
                     </li>
-                    <li>
-                        ভবিষ্যতের জন্য শিডিউল করা পোস্টের সময়ও ngrok চালু থাকতে হবে। স্থায়ী সমাধান হলো টুলটি আপনার আসল ওয়েবসাইটে চালু করা (পরের ট্যাব)।
+                    <li> ভবিষ্যতের জন্য শিডিউল করা পোস্টের সময়ও ngrok চালু থাকতে হবে।
                     </li>
                     <li>
                         Instagram শুধু <b>JPG</b> ছবি নেয় (PNG নয়), আর ভিডিও Reel হিসেবে পোস্ট হয়।
@@ -640,67 +639,6 @@ export function PublicBn({ isLocal, publicBaseUrl, appUrl }) {
 }
 
 /* -------------------------------------------------------------------------- */
-
-export function LiveBn({ redirects }) {
-    return (
-        <Section
-            title="আসল ওয়েবসাইটে চালু করুন (cPanel হোস্টিং)"
-            subtitle="নিজের কম্পিউটারে সব ঠিকমতো চললে এটা করুন, তাহলে আপনার পিসি বন্ধ থাকলেও পোস্ট হয়ে যাবে।"
-        >
-            <Words>
-                <p>
-                    হোস্টিংয়ে নিলে ওয়েব ঠিকানা বদলায়, তাই <b>Redirect URI</b>-ও বদলায়। LinkedIn, Meta আর Google শুধু আপনার রেজিস্টার করা ঠিকানাই গ্রহণ করে, তাই প্রতিটিতে নতুন ঠিকানা যোগ করতে হবে।
-                    Client ID আর Secret একই থাকবে।
-                </p>
-            </Words>
-
-            <Steps group="live">
-                <Step title="টুল হোস্টে আপলোড করে সেটআপ করুন">
-                    <p>
-                        টেকনিক্যাল ধাপগুলো (আপলোড, ডাটাবেস, <Val>.env</Val>, “Document root”, cron job) প্রজেক্ট ফোল্ডারের <b>README.md</b> ফাইলে <b>“Deploying to cPanel”</b> অংশে ধাপে ধাপে লেখা
-                        আছে। যিনি আপনার হোস্টিং দেখেন তাকে ওই অংশ দিন। সবচেয়ে গুরুত্বপূর্ণ হলো <b>cron job</b>: এটা ছাড়া শিডিউল করা পোস্ট প্রকাশ হবে না।
-                    </p>
-                </Step>
-                <Step title="নতুন Redirect URI গুলো খুঁজে নিন">
-                    <p>
-                        টুল লাইভ হওয়ার পর আপনার আসল ওয়েবসাইটে লগইন করে এই গাইড আবার খুলুন এবং নিচের ঠিকানাগুলো কপি করুন। এগুলো নিজে থেকেই আপনার নতুন ওয়েবসাইটের ঠিকানা ব্যবহার করবে।
-                    </p>
-                    <div className="space-y-3">
-                        <CopyField label="LinkedIn" value={redirects.linkedin} />
-                        <CopyField label="Facebook / Instagram (Meta)" value={redirects.facebook} />
-                        <CopyField label="YouTube (Google)" value={redirects.youtube} />
-                        <CopyField label="Threads" value={redirects.threads} />
-                        <CopyField label="X (Twitter)" value={redirects.x} />
-                    </div>
-                </Step>
-                <Step title="প্রতিটি প্ল্যাটফর্মে যোগ করুন (পুরনোগুলো মুছবেন না)">
-                    <ul className="list-disc space-y-1.5 ps-5">
-                        <li>
-                            <b>LinkedIn:</b> ডেভেলপার পেজ → আপনার অ্যাপ → <UI>Auth</UI> → <b>Authorized redirect URLs</b>-এর পাশে পেন্সিল → <UI>Add redirect URL</UI>।
-                        </li>
-                        <li>
-                            <b>Meta:</b> আপনার অ্যাপ → <UI>Facebook Login</UI> → <UI>Settings</UI> → <b>Valid OAuth Redirect URIs</b> → নতুন লাইনে যোগ করুন → <UI>Save changes</UI>।
-                        </li>
-                        <li>
-                            <b>Google:</b> Cloud Console → <UI>APIs & Services</UI> → <UI>Credentials</UI> → আপনার OAuth client-এ ক্লিক → <b>Authorized redirect URIs</b> → <UI>+ Add URI</UI> → <UI>Save</UI>।
-                        </li>
-                    </ul>
-                </Step>
-                <Step title="লাইভ সাইটে আবার Settings দিন">
-                    <p>
-                        লাইভ ওয়েবসাইটের ডাটাবেস আলাদা ও ফাঁকা, তাই ওখানে <GoSettings /> খুলে Client ID আর Secret আরেকবার পেস্ট করুন, তারপর প্রতিটি প্ল্যাটফর্মে আবার <UI>Connect</UI> চাপুন।
-                        <b> Public base URL</b> ফাঁকা রাখুন (Instagram আপনার ওয়েবসাইটের ঠিকানাই ব্যবহার করবে)।
-                    </p>
-                </Step>
-                <Step title="ডিফল্ট পাসওয়ার্ড বদলান">
-                    <p>
-                        লাইভ করার আগে অবশ্যই প্রোফাইল পেজ থেকে লগইনের পাসওয়ার্ড বদলে একটা শক্ত পাসওয়ার্ড দিন। সহজ পাসওয়ার্ড থাকলে ইন্টারনেটের যে কেউ আপনার সোশ্যাল অ্যাকাউন্টে পোস্ট করে দিতে পারে।
-                    </p>
-                </Step>
-            </Steps>
-        </Section>
-    );
-}
 
 /* -------------------------------------------------------------------------- */
 
@@ -771,7 +709,7 @@ export function FixBn() {
                     [
                         'Instagram বলছে মিডিয়া পাবলিক নয় / PUBLIC_BASE_URL-এর কথা বলছে',
                         <p key="a">
-                            Instagram আপনার কম্পিউটারে পৌঁছাতে পারছে না। <b>“Instagram পাবলিক লিংক”</b> ট্যাবের ধাপগুলো অনুসরণ করুন, অথবা টুলটি আসল ওয়েবসাইটে চালু করুন।
+                            Instagram আপনার কম্পিউটারে পৌঁছাতে পারছে না। <b>“Instagram পাবলিক লিংক”</b> ট্যাবের ধাপগুলো অনুসরণ করুন, অথবা অ্যাডমিনকে জানান।
                         </p>,
                     ],
                     [
@@ -797,21 +735,15 @@ export function FixBn() {
                         'ঠিক সময়ে পোস্ট হচ্ছে না',
                         <ul key="a" className="list-disc space-y-1 ps-5">
                             <li>
-                                <b>নিজের কম্পিউটারে:</b> scheduler উইন্ডো (<Val>php artisan schedule:work</Val> দিয়ে চালু করা কালো উইন্ডো) চালু থাকতে হবে এবং কম্পিউটার অন থাকতে হবে।
+                                <GoSettings />-এ (General → Display timezone) টাইম জোন ঠিক আছে কি না দেখুন। সময় ওই টাইম জোনেই দিতে হয়।
                             </li>
-                            <li>
-                                <b>হোস্টিংয়ে:</b> cPanel-এ “প্রতি মিনিটে” চলা cron job সেট করা থাকতে হবে। README দেখুন।
-                            </li>
-                            <li>
-                                <GoSettings />-এ (General → Display timezone) টাইম জোন ঠিক আছে কি না দেখুন।
-                            </li>
+                            <li>অনেক পোস্ট দেরি হলে অ্যাডমিনকে জানান: সার্ভারের scheduler বন্ধ হয়ে থাকতে পারে।</li>
                         </ul>,
                     ],
                     [
                         'লগইন পাসওয়ার্ড ভুলে গেছি',
                         <p key="a">
-                            কম্পিউটারে চালালে প্রজেক্ট ফোল্ডারে কমান্ড প্রম্পটে <Val>php artisan db:seed</Val> চালালে লগইন আবার ডিফল্টে (<Val>admin@example.com</Val> / <Val>admin123</Val>) ফিরে যায়। লাইভ সাইটে এটা
-                            করার আগে ভেবে নিন: ডিফল্ট পাসওয়ার্ড সহজ, লগইন করেই আবার বদলে নিন।
+                            লগইন পেজে <UI>Forgot password?</UI> চাপুন এবং আপনার ইমেইল দিন, নতুন পাসওয়ার্ড বানানোর লিংক ইমেইলে চলে যাবে। ইমেইল না এলে অ্যাডমিনকে জানান।
                         </p>,
                     ],
                 ]}

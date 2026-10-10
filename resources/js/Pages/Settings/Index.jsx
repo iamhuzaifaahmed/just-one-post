@@ -22,8 +22,8 @@ const GROUPS = [
         title: 'Meta · Facebook Page & Instagram',
         icon: (
             <span className="flex -space-x-2">
-                <PlatformIcon platform="facebook" className="ring-2 ring-white" />
-                <PlatformIcon platform="instagram" className="ring-2 ring-white" />
+                <PlatformIcon platform="facebook" className="ring-2 ring-panel" />
+                <PlatformIcon platform="instagram" className="ring-2 ring-panel" />
             </span>
         ),
         help: 'developers.facebook.com → your app → Facebook Login. One app covers both Facebook and Instagram.',
@@ -62,7 +62,7 @@ const GROUPS = [
         guide: 'public',
         title: 'General',
         icon: (
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-soft text-muted">
                 <Icon name="globe" />
             </span>
         ),
@@ -73,7 +73,7 @@ const GROUPS = [
         id: 'advanced',
         title: 'Advanced',
         icon: (
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-soft text-muted">
                 <Icon name="settings" />
             </span>
         ),
@@ -135,11 +135,11 @@ export default function Index({ fields, redirects, timezones }) {
                     <section key={g.id} className="card p-5 sm:p-6">
                         <div className="flex items-center gap-3">
                             {g.icon}
-                            <h2 className="font-semibold text-slate-900">{g.title}</h2>
+                            <h2 className="font-semibold text-fg">{g.title}</h2>
                         </div>
-                        <p className="mt-3 text-sm text-slate-500">{g.help}</p>
+                        <p className="mt-3 text-sm text-muted">{g.help}</p>
                         {g.guide && (
-                            <Link href={route('guide', { tab: g.guide })} className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                            <Link href={route('guide', { tab: g.guide })} className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:text-brand">
                                 <Icon name="book" className="h-4 w-4" /> Where do I find these? Open the step-by-step guide
                             </Link>
                         )}
@@ -160,7 +160,7 @@ export default function Index({ fields, redirects, timezones }) {
                                         <label className="label flex items-center gap-2">
                                             {LABELS[k]}
                                             {f.set && (
-                                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-300">
                                                     <Icon name="check" className="h-3 w-3" strokeWidth={3} /> saved
                                                 </span>
                                             )}
@@ -195,9 +195,9 @@ export default function Index({ fields, redirects, timezones }) {
                     </section>
                 ))}
 
-                <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/90 px-4 py-3 backdrop-blur lg:left-64">
+                <div className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-panel/90 px-4 py-3 backdrop-blur lg:left-64">
                     <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 lg:px-4">
-                        <span className="text-sm text-slate-500">{isDirty ? 'You have unsaved changes.' : 'All changes saved.'}</span>
+                        <span className="text-sm text-muted">{isDirty ? 'You have unsaved changes.' : 'All changes saved.'}</span>
                         <button type="submit" disabled={processing || !isDirty} className="btn-primary">
                             {processing ? 'Saving…' : 'Save settings'}
                         </button>

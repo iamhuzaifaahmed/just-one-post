@@ -3,7 +3,7 @@ import PlatformIcon from '@/Components/PlatformIcon';
 
 const Card = ({ icons, title, children, wide }) => (
     <div className={'card p-5 ' + (wide ? 'md:col-span-2' : '')}>
-        <div className="mb-2 flex items-center gap-2 font-semibold text-slate-900">
+        <div className="mb-2 flex items-center gap-2 font-semibold text-fg">
             {icons.map((i) => (
                 <PlatformIcon key={i} platform={i} size="sm" />
             ))}
@@ -13,7 +13,7 @@ const Card = ({ icons, title, children, wide }) => (
     </div>
 );
 
-const OL = ({ children }) => <ol className="list-decimal space-y-2 ps-5 text-sm leading-relaxed text-slate-700">{children}</ol>;
+const OL = ({ children }) => <ol className="list-decimal space-y-2 ps-5 text-sm leading-relaxed text-fg/80">{children}</ol>;
 
 /* ------------------------------ বাংলা ------------------------------ */
 
@@ -107,14 +107,14 @@ export function MoreBn() {
                 </Card>
             </div>
 
-            <h3 className="font-semibold text-slate-900">অ্যাকাউন্টকে নিজের মতো নাম দিন</h3>
-            <p className="text-sm leading-relaxed text-slate-700">
+            <h3 className="font-semibold text-fg">অ্যাকাউন্টকে নিজের মতো নাম দিন</h3>
+            <p className="text-sm leading-relaxed text-fg/80">
                 অনেকগুলো অ্যাকাউন্ট থাকলে নাম গুলিয়ে যেতে পারে। <GoConnections /> পেজে অ্যাকাউন্টের নামের পাশের <b>পেন্সিল ✎</b> আইকনে ক্লিক করে নিজের মতো নাম দিন (যেমন “দোকানের পেজ” বা
                 “ব্যক্তিগত”), তারপর <UI>Save</UI> চাপুন। এই নাম পোস্ট লেখার পেজ, ড্যাশবোর্ড ও পোস্টের তালিকায় দেখাবে। নাম মুছে দিলে আগের আসল নাম ফিরে আসবে।
             </p>
 
-            <h3 className="font-semibold text-slate-900">একসাথে অনেক অ্যাকাউন্টে পোস্ট করুন</h3>
-            <p className="text-sm leading-relaxed text-slate-700">
+            <h3 className="font-semibold text-fg">একসাথে অনেক অ্যাকাউন্টে পোস্ট করুন</h3>
+            <p className="text-sm leading-relaxed text-fg/80">
                 নতুন পোস্টের ২ নম্বর ধাপে (“Publish to”) অ্যাকাউন্টগুলো প্ল্যাটফর্ম অনুযায়ী সাজানো থাকে। যেকোনো কয়টাতে টিক দিন, অথবা প্ল্যাটফর্মের পাশের <UI>Select all</UI> চেপে সব একসাথে বেছে নিন।
                 প্রতিটি অ্যাকাউন্টের জন্য আলাদা আলাদা পোস্ট তৈরি হয়, তাই একটা ফেইল করলে বাকিগুলো আটকে যায় না।
             </p>
@@ -215,14 +215,14 @@ export function MoreEn() {
                 </Card>
             </div>
 
-            <h3 className="font-semibold text-slate-900">Give accounts your own names</h3>
-            <p className="text-sm leading-relaxed text-slate-700">
+            <h3 className="font-semibold text-fg">Give accounts your own names</h3>
+            <p className="text-sm leading-relaxed text-fg/80">
                 With many accounts, names can get confusing. On <GoConnections /> click the <b>pencil ✎</b> next to an account name, type your own name (for example “Shop page” or
                 “Personal”) and press <UI>Save</UI>. It shows in the composer, dashboard and post list. Clear it to get the original name back.
             </p>
 
-            <h3 className="font-semibold text-slate-900">Post to many accounts at once</h3>
-            <p className="text-sm leading-relaxed text-slate-700">
+            <h3 className="font-semibold text-fg">Post to many accounts at once</h3>
+            <p className="text-sm leading-relaxed text-fg/80">
                 In step 2 of a new post (“Publish to”) accounts are grouped by platform. Tick any of them, or press <UI>Select all</UI> next to a platform. Each account gets its own
                 publishing job, so one failing never blocks the others.
             </p>

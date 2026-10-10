@@ -11,22 +11,22 @@ function Stat({ label, value, icon, tone, hint }) {
             <span className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${tone}`}>
                 <Icon name={icon} className="h-5 w-5" />
             </span>
-            <div className="mt-4 text-3xl font-bold tracking-tight text-slate-900">{value}</div>
-            <div className="text-sm text-slate-500">{label}</div>
-            {hint && <div className="mt-1 text-xs text-slate-400">{hint}</div>}
+            <div className="mt-4 text-3xl font-bold tracking-tight text-fg">{value}</div>
+            <div className="text-sm text-muted">{label}</div>
+            {hint && <div className="mt-1 text-xs text-muted/80">{hint}</div>}
         </div>
     );
 }
 
 function Health({ ok, title, children }) {
     return (
-        <div className={'card flex gap-3 p-5 ' + (ok ? '' : 'border-red-200 bg-red-50/50')}>
-            <span className={'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ' + (ok ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600')}>
+        <div className={'card flex gap-3 p-5 ' + (ok ? '' : 'border-red-500/30 bg-red-500/10')}>
+            <span className={'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ' + (ok ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' : 'bg-red-500/15 text-red-700 dark:text-red-300')}>
                 <Icon name={ok ? 'check' : 'alert'} className="h-4 w-4" strokeWidth={2.5} />
             </span>
             <div className="min-w-0">
-                <div className="font-semibold text-slate-900">{title}</div>
-                <div className="mt-0.5 text-sm text-slate-600">{children}</div>
+                <div className="font-semibold text-fg">{title}</div>
+                <div className="mt-0.5 text-sm text-muted">{children}</div>
             </div>
         </div>
     );
@@ -72,17 +72,17 @@ export default function Dashboard({ users, accountsByPlatform, needsReconnect, p
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-                    <Stat label="Users" value={users.total} icon="users" tone="bg-indigo-50 text-indigo-600" hint={`${users.admins} admin(s) · ${users.suspended} suspended`} />
-                    <Stat label="New users (7 days)" value={users.new_7d} icon="plus" tone="bg-sky-50 text-sky-600" />
-                    <Stat label="Published (24h)" value={last24h.published} icon="checkCircle" tone="bg-emerald-50 text-emerald-600" />
-                    <Stat label="Failed (24h)" value={last24h.failed} icon="alert" tone="bg-red-50 text-red-600" />
+                    <Stat label="Users" value={users.total} icon="users" tone="bg-brand/10 text-brand" hint={`${users.admins} admin(s) · ${users.suspended} suspended`} />
+                    <Stat label="New users (7 days)" value={users.new_7d} icon="plus" tone="bg-sky-500/10 text-sky-700 dark:text-sky-300" />
+                    <Stat label="Published (24h)" value={last24h.published} icon="checkCircle" tone="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" />
+                    <Stat label="Failed (24h)" value={last24h.failed} icon="alert" tone="bg-red-500/10 text-red-700 dark:text-red-300" />
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     <section className="card p-5">
-                        <h2 className="font-semibold text-slate-900">Connected accounts ({totalAccounts})</h2>
+                        <h2 className="font-semibold text-fg">Connected accounts ({totalAccounts})</h2>
                         {totalAccounts === 0 ? (
-                            <p className="mt-3 text-sm text-slate-500">No accounts connected yet.</p>
+                            <p className="mt-3 text-sm text-muted">No accounts connected yet.</p>
                         ) : (
                             <ul className="mt-4 space-y-3">
                                 {Object.entries(accountsByPlatform)
@@ -90,11 +90,11 @@ export default function Dashboard({ users, accountsByPlatform, needsReconnect, p
                                     .map(([platform, n]) => (
                                         <li key={platform} className="flex items-center gap-3">
                                             <PlatformIcon platform={platform} size="sm" />
-                                            <span className="w-28 shrink-0 text-sm text-slate-700">{platforms[platform] || platform}</span>
-                                            <span className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
-                                                <span className="block h-2 rounded-full bg-indigo-500" style={{ width: `${(n / totalAccounts) * 100}%` }} />
+                                            <span className="w-28 shrink-0 text-sm text-fg/80">{platforms[platform] || platform}</span>
+                                            <span className="h-2 flex-1 overflow-hidden rounded-full bg-soft">
+                                                <span className="block h-2 rounded-full bg-brand" style={{ width: `${(n / totalAccounts) * 100}%` }} />
                                             </span>
-                                            <span className="w-8 text-right text-sm font-medium text-slate-900">{n}</span>
+                                            <span className="w-8 text-right text-sm font-medium text-fg">{n}</span>
                                         </li>
                                     ))}
                             </ul>
@@ -102,15 +102,15 @@ export default function Dashboard({ users, accountsByPlatform, needsReconnect, p
                     </section>
 
                     <section className="card p-5">
-                        <h2 className="font-semibold text-slate-900">Posts ({totalPosts})</h2>
+                        <h2 className="font-semibold text-fg">Posts ({totalPosts})</h2>
                         {totalPosts === 0 ? (
-                            <p className="mt-3 text-sm text-slate-500">No posts yet.</p>
+                            <p className="mt-3 text-sm text-muted">No posts yet.</p>
                         ) : (
                             <div className="mt-4 flex flex-wrap gap-2">
                                 {Object.entries(postsByStatus).map(([status, n]) => (
-                                    <span key={status} className="inline-flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 ring-1 ring-slate-200">
+                                    <span key={status} className="inline-flex items-center gap-2 rounded-xl bg-soft px-3 py-2 ring-1 ring-line">
                                         <StatusBadge status={status} />
-                                        <span className="text-sm font-semibold text-slate-900">{n}</span>
+                                        <span className="text-sm font-semibold text-fg">{n}</span>
                                     </span>
                                 ))}
                             </div>
@@ -119,24 +119,24 @@ export default function Dashboard({ users, accountsByPlatform, needsReconnect, p
                 </div>
 
                 <section className="card overflow-hidden">
-                    <div className="border-b border-slate-100 px-5 py-4">
-                        <h2 className="font-semibold text-slate-900">Recent failures (all users)</h2>
+                    <div className="border-b border-line px-5 py-4">
+                        <h2 className="font-semibold text-fg">Recent failures (all users)</h2>
                     </div>
                     {failures.length === 0 ? (
-                        <div className="px-5 py-10 text-center text-sm text-slate-500">No failed posts. 🎉</div>
+                        <div className="px-5 py-10 text-center text-sm text-muted">No failed posts. 🎉</div>
                     ) : (
-                        <ul className="divide-y divide-slate-100">
+                        <ul className="divide-y divide-line">
                             {failures.map((f) => (
                                 <li key={f.id} className="flex flex-wrap items-start gap-3 px-5 py-4">
                                     <PlatformIcon platform={f.platform} size="sm" />
                                     <div className="min-w-0 flex-1 basis-60">
                                         <div className="text-sm">
-                                            <span className="font-medium text-slate-900">{f.account}</span>
-                                            <span className="text-slate-500"> · {f.user}</span>
+                                            <span className="font-medium text-fg">{f.account}</span>
+                                            <span className="text-muted"> · {f.user}</span>
                                         </div>
-                                        <div className="mt-1 text-xs text-red-600">{f.error}</div>
+                                        <div className="mt-1 text-xs text-red-700 dark:text-red-300">{f.error}</div>
                                     </div>
-                                    <span className="text-xs text-slate-400">{f.when}</span>
+                                    <span className="text-xs text-muted/80">{f.when}</span>
                                 </li>
                             ))}
                         </ul>

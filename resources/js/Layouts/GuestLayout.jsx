@@ -1,43 +1,35 @@
-import Brand, { BrandMark } from '@/Components/Brand';
+import Brand from '@/Components/Brand';
 import PlatformIcon from '@/Components/PlatformIcon';
+import ThemeToggle from '@/Components/ThemeToggle';
 import { Link } from '@inertiajs/react';
 
+const PLATFORMS = ['linkedin', 'facebook', 'instagram', 'youtube', 'threads', 'x', 'telegram', 'discord', 'wordpress'];
+
+/** Login, register and password pages: a centred panel on the grid + glow background. */
 export default function GuestLayout({ children }) {
     return (
-        <div className="grid min-h-screen lg:grid-cols-2">
-            {/* Brand panel */}
-            <div className="relative hidden overflow-hidden bg-slate-900 p-12 text-white lg:flex lg:flex-col lg:justify-between">
-                <div className="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-indigo-600/30 blur-3xl" />
-                <div className="pointer-events-none absolute -bottom-32 -right-16 h-[28rem] w-[28rem] rounded-full bg-fuchsia-600/20 blur-3xl" />
+        <div className="relative flex min-h-screen flex-col overflow-hidden bg-canvas">
+            <div className="grid-bg pointer-events-none absolute inset-0" aria-hidden="true" />
+            <div className="glow pointer-events-none absolute inset-x-0 top-0 h-[28rem]" aria-hidden="true" />
 
-                <Link href="/" className="relative">
-                    <Brand dark />
+            <header className="relative mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5">
+                <Link href="/" aria-label="Home">
+                    <Brand />
                 </Link>
+                <ThemeToggle />
+            </header>
 
-                <div className="relative">
-                    <h2 className="max-w-md text-4xl font-bold leading-tight tracking-tight">
-                        Write once. <span className="bg-gradient-to-r from-indigo-300 to-fuchsia-300 bg-clip-text text-transparent">Publish everywhere.</span>
-                    </h2>
-                    <p className="mt-4 max-w-md text-slate-400">
-                        Your own private scheduler for LinkedIn, Facebook, Instagram and YouTube. Pick the time and it posts itself.
-                    </p>
-                    <div className="mt-8 flex gap-3">
-                        {['linkedin', 'facebook', 'instagram', 'youtube'].map((p) => (
-                            <PlatformIcon key={p} platform={p} size="lg" />
+            <main className="relative flex flex-1 items-center justify-center px-5 pb-12">
+                <div className="w-full max-w-md">
+                    <div className="card p-6 sm:p-8">{children}</div>
+
+                    <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+                        {PLATFORMS.map((p) => (
+                            <PlatformIcon key={p} platform={p} size="sm" className="opacity-80" />
                         ))}
                     </div>
                 </div>
-
-                <p className="relative text-xs text-slate-500">Self-hosted · single user · your data stays with you</p>
-            </div>
-
-            {/* Form panel */}
-            <div className="flex flex-col items-center justify-center px-6 py-12">
-                <Link href="/" className="mb-8 lg:hidden">
-                    <BrandMark className="h-12 w-12" />
-                </Link>
-                <div className="w-full max-w-sm">{children}</div>
-            </div>
+            </main>
         </div>
     );
 }

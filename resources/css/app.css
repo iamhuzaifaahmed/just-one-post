@@ -2,47 +2,109 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Techlo design tokens. Values are "R G B" so Tailwind can add opacity (bg-brand/10). */
+:root {
+    --c-canvas: 255 255 255;
+    --c-soft: 244 247 252;
+    --c-panel: 255 255 255;
+    --c-fg: 11 18 32;
+    --c-muted: 91 102 122;
+    --c-line: 225 231 240;
+    --c-brand: 1 99 234;
+    --c-brand-fg: 255 255 255;
+    --c-accent: 24 169 229;
+    --grid: rgb(11 18 32 / 0.06);
+    color-scheme: light;
+}
+
+.dark {
+    --c-canvas: 5 8 15;
+    --c-soft: 9 14 26;
+    --c-panel: 13 20 36;
+    --c-fg: 232 237 247;
+    --c-muted: 139 151 173;
+    --c-line: 26 39 64;
+    --c-brand: 59 140 255;
+    --c-brand-fg: 4 16 31;
+    --c-accent: 46 196 255;
+    --grid: rgb(139 151 173 / 0.08);
+    color-scheme: dark;
+}
+
 @layer base {
     html {
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        background: rgb(var(--c-canvas));
     }
     body {
-        @apply bg-slate-50 text-slate-800;
+        @apply bg-canvas text-fg;
+    }
+    ::selection {
+        background: rgb(var(--c-brand) / 0.25);
     }
 }
 
 @layer components {
     .card {
-        @apply rounded-2xl border border-slate-200/80 bg-white shadow-soft;
+        @apply rounded-2xl border border-line bg-panel shadow-soft;
     }
 
     .btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+        @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:cursor-not-allowed disabled:opacity-50;
     }
     .btn-primary {
-        @apply btn bg-indigo-600 text-white shadow-sm hover:bg-indigo-500 active:bg-indigo-700;
+        @apply btn bg-brand text-brand-fg shadow-sm shadow-brand/25 hover:bg-brand/90 active:bg-brand/80;
     }
     .btn-secondary {
-        @apply btn border border-slate-300 bg-white text-slate-700 shadow-sm hover:bg-slate-50;
+        @apply btn border border-line bg-panel text-fg shadow-sm hover:bg-soft;
     }
     .btn-danger {
         @apply btn bg-red-600 text-white shadow-sm hover:bg-red-500;
     }
     .btn-ghost {
-        @apply btn text-slate-600 hover:bg-slate-100;
+        @apply btn text-muted hover:bg-soft hover:text-fg;
     }
     .btn-sm {
         @apply rounded-lg px-3 py-1.5 text-xs;
     }
 
     .input {
-        @apply block w-full rounded-xl border-slate-300 bg-white text-sm shadow-sm placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500;
+        @apply block w-full rounded-xl border-line bg-panel text-sm text-fg shadow-sm placeholder:text-muted/60 focus:border-brand focus:ring-brand;
     }
     .label {
-        @apply block text-sm font-medium text-slate-700;
+        @apply block text-sm font-medium text-fg/90;
     }
     .hint {
-        @apply text-xs text-slate-500;
+        @apply text-xs text-muted;
+    }
+
+    /* Small mono caption with a brand dot, as on techloit.com */
+    .eyebrow {
+        @apply inline-flex items-center gap-2 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-brand;
+    }
+    .eyebrow::before {
+        content: '';
+        @apply size-1.5 rounded-full bg-brand;
+    }
+
+    /* Faint engineering-paper grid + a soft brand glow at the top (hero / auth backgrounds) */
+    .grid-bg {
+        background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+        background-size: 44px 44px;
+        mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, #000 40%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, #000 40%, transparent 100%);
+    }
+    .glow {
+        background: radial-gradient(55% 55% at 50% 0%, rgb(var(--c-brand) / 0.22), transparent 70%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
     }
 }

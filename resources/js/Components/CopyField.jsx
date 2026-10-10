@@ -28,8 +28,8 @@ export default function CopyField({ value, label }) {
     return (
         <div>
             {label && <div className="hint mb-1">{label}</div>}
-            <div className="flex items-center gap-2 rounded-xl bg-slate-50 p-2 ps-3 ring-1 ring-slate-200">
-                <code className="min-w-0 flex-1 select-all break-all text-xs text-slate-800">{value}</code>
+            <div className="flex items-center gap-2 rounded-xl bg-soft p-2 ps-3 ring-1 ring-line">
+                <code className="min-w-0 flex-1 select-all break-all text-xs text-fg">{value}</code>
                 <button type="button" onClick={copy} className="btn-secondary btn-sm shrink-0">
                     <Icon name={copied ? 'check' : 'copy'} className="h-3.5 w-3.5" />
                     {copied ? 'Copied' : 'Copy'}

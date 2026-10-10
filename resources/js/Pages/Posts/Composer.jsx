@@ -40,11 +40,11 @@ function Step({ n, title, hint, children }) {
     return (
         <section className="card p-5 sm:p-6">
             <div className="mb-4 flex items-start gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-semibold text-brand-fg">
                     {n}
                 </span>
                 <div>
-                    <h2 className="font-semibold text-slate-900">{title}</h2>
+                    <h2 className="font-semibold text-fg">{title}</h2>
                     {hint && <p className="hint">{hint}</p>}
                 </div>
             </div>
@@ -190,7 +190,7 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                                         key={c.platform}
                                         className={
                                             'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ' +
-                                            (c.over ? 'bg-red-50 text-red-700' : 'bg-slate-100 text-slate-600')
+                                            (c.over ? 'bg-red-500/10 text-red-700 dark:text-red-300' : 'bg-soft text-muted')
                                         }
                                     >
                                         <PlatformIcon platform={c.platform} size="sm" className="!h-4 !w-4 !rounded" />
@@ -209,7 +209,7 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                                 onChange={(e) => pickFile(e.target.files[0])}
                             />
                             {media ? (
-                                <div className="flex items-center gap-4 rounded-xl border border-slate-200 p-3">
+                                <div className="flex items-center gap-4 rounded-xl border border-line p-3">
                                     {media.type === 'image' ? (
                                         <img src={media.url} alt="" className="h-16 w-16 rounded-lg object-cover" />
                                     ) : (
@@ -218,8 +218,8 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                                         </div>
                                     )}
                                     <div className="min-w-0 flex-1 text-sm">
-                                        <div className="truncate font-medium text-slate-800">{media.name || `Attached ${media.type}`}</div>
-                                        <div className="text-xs text-slate-500">
+                                        <div className="truncate font-medium text-fg">{media.name || `Attached ${media.type}`}</div>
+                                        <div className="text-xs text-muted">
                                             {media.size ? formatSize(media.size) : 'Already uploaded'}
                                         </div>
                                     </div>
@@ -229,7 +229,7 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                                     <button
                                         type="button"
                                         onClick={() => setData((d) => ({ ...d, media: null, remove_media: true }))}
-                                        className="btn-ghost btn-sm text-red-600 hover:bg-red-50"
+                                        className="btn-ghost btn-sm text-red-700 dark:text-red-300 hover:bg-red-500/10"
                                     >
                                         Remove
                                     </button>
@@ -249,17 +249,17 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                                     }}
                                     className={
                                         'flex cursor-pointer flex-col items-center rounded-xl border-2 border-dashed px-6 py-8 text-center transition ' +
-                                        (dragging ? 'border-indigo-400 bg-indigo-50' : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50')
+                                        (dragging ? 'border-brand bg-brand/10' : 'border-line hover:border-muted/40 hover:bg-soft')
                                     }
                                 >
-                                    <Icon name="upload" className="h-7 w-7 text-slate-400" />
-                                    <div className="mt-2 text-sm font-medium text-slate-700">Drop an image or video, or click to browse</div>
+                                    <Icon name="upload" className="h-7 w-7 text-muted/80" />
+                                    <div className="mt-2 text-sm font-medium text-fg/80">Drop an image or video, or click to browse</div>
                                     <div className="hint mt-0.5">JPG, PNG, GIF, WEBP, MP4, MOV, WEBM</div>
                                 </div>
                             )}
                             {progress && (
-                                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-200">
-                                    <div className="h-2 rounded-full bg-indigo-500 transition-all" style={{ width: `${progress.percentage}%` }} />
+                                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-line">
+                                    <div className="h-2 rounded-full bg-brand transition-all" style={{ width: `${progress.percentage}%` }} />
                                 </div>
                             )}
                             <InputError message={errors.media} className="mt-2" />
@@ -269,9 +269,9 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                     {/* 2. Platforms */}
                     <Step n={2} title="Publish to" hint="Pick one or more connected accounts.">
                         {accounts.length === 0 ? (
-                            <div className="rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
+                            <div className="rounded-xl bg-soft p-4 text-sm text-muted">
                                 No accounts connected yet.{' '}
-                                <Link href={route('connections.index')} className="font-medium text-indigo-600">
+                                <Link href={route('connections.index')} className="font-medium text-brand">
                                     Connect an account
                                 </Link>
                             </div>
@@ -285,16 +285,16 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                                     return (
                                         <div key={platform}>
                                             <div className="mb-2 flex items-center justify-between">
-                                                <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                                                <div className="flex items-center gap-2 text-sm font-semibold text-fg/80">
                                                     <PlatformIcon platform={platform} size="sm" />
                                                     {platforms[platform]}
-                                                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">{list.length}</span>
+                                                    <span className="rounded-full bg-soft px-2 py-0.5 text-xs font-medium text-muted">{list.length}</span>
                                                 </div>
                                                 {usable.length > 1 && (
                                                     <button
                                                         type="button"
                                                         onClick={() => setGroup(usable.map((a) => a.id), !allOn)}
-                                                        className="text-xs font-medium text-indigo-600 hover:text-indigo-500"
+                                                        className="text-xs font-medium text-brand hover:text-brand"
                                                     >
                                                         {allOn ? 'Clear all' : 'Select all'}
                                                     </button>
@@ -311,20 +311,20 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                                                             onClick={() => toggle(a.id)}
                                                             className={
                                                                 'flex items-center gap-3 rounded-xl border p-3 text-left transition disabled:cursor-not-allowed disabled:opacity-50 ' +
-                                                                (on ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50')
+                                                                (on ? 'border-brand bg-brand/10 ring-1 ring-brand' : 'border-line hover:border-line hover:bg-soft')
                                                             }
                                                         >
                                                             <PlatformIcon platform={a.platform} />
                                                             <span className="min-w-0 flex-1">
-                                                                <span className="block truncate text-sm font-medium text-slate-900">{a.display_name}</span>
-                                                                <span className="block text-xs text-slate-500">
+                                                                <span className="block truncate text-sm font-medium text-fg">{a.display_name}</span>
+                                                                <span className="block text-xs text-muted">
                                                                     {a.needs_reconnect ? 'Needs reconnect' : platforms[a.platform]}
                                                                 </span>
                                                             </span>
                                                             <span
                                                                 className={
                                                                     'flex h-5 w-5 items-center justify-center rounded-full border ' +
-                                                                    (on ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-slate-300')
+                                                                    (on ? 'border-brand bg-brand text-brand-fg' : 'border-line')
                                                                 }
                                                             >
                                                                 {on && <Icon name="check" className="h-3 w-3" strokeWidth={3} />}
@@ -340,7 +340,7 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                         )}
 
                         {errorList.length > 0 && (
-                            <ul className="mt-4 space-y-1 rounded-xl bg-red-50 p-3 text-sm text-red-700">
+                            <ul className="mt-4 space-y-1 rounded-xl bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-300">
                                 {errorList.map((m, i) => (
                                     <li key={i} className="flex gap-2">
                                         <Icon name="alert" className="mt-0.5 h-4 w-4 shrink-0" /> {m}
@@ -354,8 +354,8 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                             .map((a) => {
                                 const t = data.targets[a.id];
                                 return (
-                                    <div key={a.id} className="mt-5 space-y-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-                                        <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+                                    <div key={a.id} className="mt-5 space-y-3 rounded-xl border border-line bg-soft/60 p-4">
+                                        <div className="flex items-center gap-2 text-sm font-semibold text-fg">
                                             <PlatformIcon platform="wordpress" size="sm" /> WordPress options · {a.display_name}
                                         </div>
                                         <input
@@ -367,7 +367,7 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                                             className="input"
                                         />
                                         <label className="flex items-center gap-2 text-sm">
-                                            <span className="text-slate-600">Status</span>
+                                            <span className="text-muted">Status</span>
                                             <select
                                                 value={t.status || 'publish'}
                                                 onChange={(e) => setOverride(a.id, 'status', e.target.value)}
@@ -387,8 +387,8 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                             .map((a) => {
                                 const t = data.targets[a.id];
                                 return (
-                                    <div key={a.id} className="mt-5 space-y-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-                                        <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+                                    <div key={a.id} className="mt-5 space-y-3 rounded-xl border border-line bg-soft/60 p-4">
+                                        <div className="flex items-center gap-2 text-sm font-semibold text-fg">
                                             <PlatformIcon platform="youtube" size="sm" /> YouTube options · {a.display_name}
                                         </div>
                                         <input
@@ -408,7 +408,7 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                                         />
                                         <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
                                             <label className="flex items-center gap-2">
-                                                <span className="text-slate-600">Privacy</span>
+                                                <span className="text-muted">Privacy</span>
                                                 <select
                                                     value={t.privacy || 'private'}
                                                     onChange={(e) => setOverride(a.id, 'privacy', e.target.value)}
@@ -424,9 +424,9 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                                                     type="checkbox"
                                                     checked={!!t.native_schedule}
                                                     onChange={(e) => setOverride(a.id, 'native_schedule', e.target.checked)}
-                                                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                                    className="mt-0.5 h-4 w-4 rounded border-line text-brand focus:ring-brand"
                                                 />
-                                                <span className="text-slate-600">
+                                                <span className="text-muted">
                                                     Upload now as private; YouTube publishes at the scheduled time
                                                 </span>
                                             </label>
@@ -447,8 +447,8 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                                 className="input !w-auto"
                             />
                             {data.scheduled_at && (
-                                <span className="flex items-center gap-1.5 text-sm text-slate-600">
-                                    <Icon name="calendar" className="h-4 w-4 text-slate-400" /> {pretty(data.scheduled_at)}
+                                <span className="flex items-center gap-1.5 text-sm text-muted">
+                                    <Icon name="calendar" className="h-4 w-4 text-muted/80" /> {pretty(data.scheduled_at)}
                                 </span>
                             )}
                         </div>
@@ -461,8 +461,8 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                                     className={
                                         'rounded-full border px-3 py-1 text-xs font-medium transition ' +
                                         (data.scheduled_at === value
-                                            ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                                            : 'border-slate-200 text-slate-600 hover:bg-slate-50')
+                                            ? 'border-brand bg-brand/10 text-brand'
+                                            : 'border-line text-muted hover:bg-soft')
                                     }
                                 >
                                     {label}
@@ -473,7 +473,7 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                     </Step>
 
                     {/* Actions */}
-                    <div className="sticky bottom-0 -mx-4 flex flex-wrap items-center gap-3 border-t border-slate-200 bg-slate-50/90 px-4 py-4 backdrop-blur sm:mx-0 sm:rounded-2xl sm:border">
+                    <div className="sticky bottom-0 -mx-4 flex flex-wrap items-center gap-3 border-t border-line bg-soft/90 px-4 py-4 backdrop-blur sm:mx-0 sm:rounded-2xl sm:border">
                         <button type="button" disabled={!canSubmit} onClick={() => send('schedule')} className="btn-primary">
                             <Icon name="calendar" className="h-4 w-4" />
                             {processing ? 'Saving…' : editing ? 'Save & schedule' : 'Schedule post'}
@@ -488,26 +488,26 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                 {/* Preview */}
                 <aside className="space-y-4 xl:sticky xl:top-6">
                     <div className="card overflow-hidden">
-                        <div className="border-b border-slate-100 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <div className="border-b border-line px-5 py-3 text-xs font-semibold uppercase tracking-wide text-muted">
                             Preview
                         </div>
                         <div className="p-5">
                             <div className="flex items-center gap-3">
-                                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-fuchsia-400 font-bold text-white">
+                                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand to-accent font-bold text-white">
                                     {auth.user.name.charAt(0).toUpperCase()}
                                 </span>
                                 <div>
-                                    <div className="text-sm font-semibold text-slate-900">{auth.user.name}</div>
-                                    <div className="text-xs text-slate-500">
+                                    <div className="text-sm font-semibold text-fg">{auth.user.name}</div>
+                                    <div className="text-xs text-muted">
                                         {data.scheduled_at ? pretty(data.scheduled_at) : 'Publish time not set'}
                                     </div>
                                 </div>
                             </div>
-                            <p className="mt-4 whitespace-pre-wrap break-words text-sm text-slate-800">
-                                {data.body || <span className="text-slate-400">Your text will appear here…</span>}
+                            <p className="mt-4 whitespace-pre-wrap break-words text-sm text-fg">
+                                {data.body || <span className="text-muted/80">Your text will appear here…</span>}
                             </p>
                             {media && (
-                                <div className="mt-4 overflow-hidden rounded-xl bg-slate-100">
+                                <div className="mt-4 overflow-hidden rounded-xl bg-soft">
                                     {media.type === 'image' ? (
                                         <img src={media.url} alt="" className="max-h-72 w-full object-cover" />
                                     ) : (
@@ -516,14 +516,14 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                                 </div>
                             )}
                         </div>
-                        <div className="flex items-center gap-2 border-t border-slate-100 bg-slate-50 px-5 py-3">
-                            <span className="text-xs text-slate-500">Going to</span>
+                        <div className="flex items-center gap-2 border-t border-line bg-soft px-5 py-3">
+                            <span className="text-xs text-muted">Going to</span>
                             {selectedAccounts.length === 0 ? (
-                                <span className="text-xs text-slate-400">nowhere yet</span>
+                                <span className="text-xs text-muted/80">nowhere yet</span>
                             ) : (
                                 <span className="flex -space-x-1.5">
                                     {selectedAccounts.map((a) => (
-                                        <PlatformIcon key={a.id} platform={a.platform} size="sm" className="ring-2 ring-slate-50" />
+                                        <PlatformIcon key={a.id} platform={a.platform} size="sm" className="ring-2 ring-line" />
                                     ))}
                                 </span>
                             )}
@@ -531,7 +531,7 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                     </div>
 
                     {warnings.length > 0 && (
-                        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-700 dark:text-amber-300">
                             <div className="mb-1 flex items-center gap-2 font-semibold">
                                 <Icon name="alert" className="h-4 w-4" /> Heads up
                             </div>

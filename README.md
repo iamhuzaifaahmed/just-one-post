@@ -1,6 +1,6 @@
-# Just One Post
+# Techlo Post
 
-A self-hosted, multi-user (SaaS-style) social media scheduler: people register, connect their own accounts and schedule posts, and the person who installs it gets an admin panel. Write one post (text + optional image/video), pick the accounts to publish to, pick a date/time, and the app publishes automatically to **LinkedIn (personal profile), Facebook Pages, Instagram (Business/Creator), YouTube, Threads, X (Twitter), Telegram, Discord and WordPress**. Connect as many accounts of each as you like.
+A multi-user (SaaS-style) social media scheduler (the **user panel**; the marketing site lives separately on techloit.com). Light and dark theme, Techlo design, instant page-to-page navigation: people register, connect their own accounts and schedule posts, and the person who installs it gets an admin panel. Write one post (text + optional image/video), pick the accounts to publish to, pick a date/time, and the app publishes automatically to **LinkedIn (personal profile), Facebook Pages, Instagram (Business/Creator), YouTube, Threads, X (Twitter), Telegram, Discord and WordPress**. Connect as many accounts of each as you like.
 
 * Laravel 12 · PHP 8.2+ · React + Inertia (Breeze) · Vite · MySQL
 * Designed for **shared cPanel hosting**: no queue daemon, no supervisor. One cron line drives everything.
@@ -142,40 +142,54 @@ One Meta app covers both Facebook Pages and Instagram.
 
 ---
 
-## Deploying to cPanel
+## Deploying to cPanel (no Node.js on the server)
 
-1. **Upload the project** (zip/git/File Manager) to e.g. `/home/USER/just-one-post` – *outside* `public_html`. If you can't build assets on the server, run `npm run build` locally and upload the `public/build` folder too. Run `composer install --no-dev --optimize-autoloader` locally (or via cPanel Terminal/SSH) so `vendor/` is present.
-2. **Document root → `/public`.** In cPanel → *Domains* (or *Subdomains*) set the domain's document root to `/home/USER/just-one-post/public`. (If you must use `public_html`, copy the *contents* of `public/` there and edit `index.php` so the two `__DIR__.'/../...'` paths point at the project folder.)
-3. **PHP:** select PHP 8.2+ (MultiPHP Manager) with extensions `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `curl`, `gd`. Raise `upload_max_filesize` and `post_max_size` (MultiPHP INI Editor) if you upload videos, e.g. 512M, and `max_execution_time`/`memory_limit` generously; also adjust `UPLOAD_MAX_KB` in `.env`.
-4. **Database:** *MySQL Databases* → create a DB + user, grant all privileges.
-5. **`.env`:** copy `.env.example` to `.env` and set:
+The server only runs **PHP**. Node.js is used on *your own computer* to compile the React front end into `public/build`; nothing in production needs it, and all pages are bundled so there is no runtime JavaScript build or download step.
+
+**Option A: release zip (recommended).** On your Windows computer (Node + Composer installed):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/make-release.ps1
+```
+
+This compiles the front end, installs PHP packages without dev tools, leaves out `.git`, `node_modules`, tests, `.env` and uploads, and writes `release/techlo-post-<date>.zip`. Upload it with cPanel → File Manager and *Extract* it to e.g. `/home/USER/techlo-post` (outside `public_html`).
+
+**Option B: git.** `public/build` is committed (the compiled front end), so `git pull` on the server (cPanel → *Git Version Control*) already contains it. You still need `vendor/`: run `composer install --no-dev --optimize-autoloader` in cPanel Terminal, or upload a `vendor.zip` built locally. Before pushing UI changes run `npm run build` and commit `public/build`.
+
+Then, on the server:
+
+1. **Document root → `/public`.** cPanel → *Domains*: set the domain's document root to `/home/USER/techlo-post/public`. (If you cannot change it, the root `.htaccess` forwards everything to `public/` and blocks `.env`, `vendor`, `storage` etc.)
+2. **PHP:** select PHP 8.2+ (MultiPHP Manager) with `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `curl`, `gd`. Raise `upload_max_filesize`/`post_max_size` (e.g. 512M) and `max_execution_time`/`memory_limit` for video uploads; adjust `UPLOAD_MAX_KB` in `.env`.
+3. **Database:** *MySQL Databases* → create a DB + user with all privileges.
+4. **`.env`:** copy `.env.example` to `.env` and set:
    ```
+   APP_NAME="Techlo Post"
    APP_ENV=production
    APP_DEBUG=false
-   APP_URL=https://your-domain.com
+   APP_URL=https://app.your-domain.com
    DB_DATABASE=cpaneluser_dbname
    DB_USERNAME=cpaneluser_dbuser
    DB_PASSWORD=...
    QUEUE_CONNECTION=database
    SESSION_DRIVER=database
-   LINKEDIN_REDIRECT_URI="${APP_URL}/connections/linkedin/callback"   # (already the default)
+   MAIL_*  (so password-reset e-mails work)
    ```
-   plus all client IDs/secrets. Generate the key once: `php artisan key:generate --force`. **Back up `APP_KEY`** – tokens are encrypted with it and become unreadable if it changes.
-6. **Commands (cPanel Terminal or SSH):**
+   Generate the key once: `php artisan key:generate --force`. **Back up `APP_KEY`**: tokens are encrypted with it and become unreadable if it changes.
+5. **Commands (cPanel Terminal or SSH):**
    ```bash
-   cd /home/USER/just-one-post
+   cd /home/USER/techlo-post
    php artisan migrate --force
    php artisan storage:link
    php artisan config:cache && php artisan route:cache
    ```
-   If `storage:link` isn't possible (symlinks disabled), create the symlink with *cron* or ask the host, or copy/point the document root so `/storage` resolves to `storage/app/public`.
-   Make sure `storage/` and `bootstrap/cache/` are writable (755/775).
-7. **Cron (cPanel → Cron Jobs)** – one entry, every minute (use the PHP CLI path your host shows, often `/usr/local/bin/php` or `/opt/cpanel/ea-php82/root/usr/bin/php`):
+   If symlinks are disabled, ask the host to link `public/storage` → `storage/app/public`. Make sure `storage/` and `bootstrap/cache/` are writable (755/775).
+6. **Cron (cPanel → Cron Jobs)**, one entry, every minute (use the PHP CLI path your host shows, often `/usr/local/bin/php` or `/opt/cpanel/ea-php82/root/usr/bin/php`):
    ```
-   * * * * * /usr/local/bin/php /home/USER/just-one-post/artisan schedule:run >> /dev/null 2>&1
+   * * * * * /usr/local/bin/php /home/USER/techlo-post/artisan schedule:run >> /dev/null 2>&1
    ```
-8. Visit `https://your-domain.com/register`, create your account (registration closes itself afterwards), then **Connections**. Register the production redirect URIs in each developer app.
-9. After deploys: `php artisan migrate --force && php artisan config:cache && php artisan route:cache`, and re-run `npm run build` locally when the UI changes.
+   The admin **Overview** page shows when the scheduler last ran and turns red if it stopped.
+7. Open the site and register: **the first account becomes the admin**. Change the password if you used `db:seed`.
+8. **Updating later:** upload the new release zip over the old files (keep `.env` and `storage/`), then run `php artisan migrate --force && php artisan config:cache && php artisan route:cache`.
 
 **Cron/queue behaviour on shared hosting:** `queue:work --stop-when-empty --max-time=50` starts each minute in the background, processes everything pending and exits. Several short-lived workers can overlap safely (the database queue reserves jobs atomically). `QUEUE_RETRY_AFTER` (default 1800 s) must exceed your longest upload so a slow video upload isn't picked up twice; even if it were, the idempotency checks prevent a double post. If your host kills long-running processes, large video uploads may fail – they'll be retried and eventually marked failed with the error shown.
 

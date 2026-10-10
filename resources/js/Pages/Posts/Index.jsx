@@ -37,21 +37,21 @@ export default function Index({ tab, counts, posts }) {
         >
             <Head title="Posts" />
 
-            <div className="mb-5 flex w-full max-w-full overflow-x-auto rounded-xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden bg-slate-200/70 p-1 sm:inline-flex sm:w-auto">
+            <div className="mb-5 flex w-full max-w-full overflow-x-auto rounded-xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden bg-line/70 p-1 sm:inline-flex sm:w-auto">
                 {TABS.map(([key, label]) => (
                     <Link
                         key={key}
                         href={route('posts.index', { tab: key })}
                         className={
                             'flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-1.5 text-[13px] font-medium transition sm:flex-none sm:gap-2 sm:px-4 sm:text-sm ' +
-                            (tab === key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900')
+                            (tab === key ? 'bg-panel text-fg shadow-sm' : 'text-muted hover:text-fg')
                         }
                     >
                         {label}
                         <span
                             className={
                                 'rounded-full px-1.5 text-xs ' +
-                                (key === 'failed' && counts[key] > 0 ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-500')
+                                (key === 'failed' && counts[key] > 0 ? 'bg-red-500/15 text-red-700 dark:text-red-300' : 'bg-soft text-muted')
                             }
                         >
                             {counts[key]}
@@ -80,12 +80,12 @@ export default function Index({ tab, counts, posts }) {
                                 <div className="min-w-0 flex-1">
                                     <div className="flex flex-wrap items-center gap-2">
                                         <StatusBadge status={p.status} />
-                                        <span className="flex items-center gap-1 text-sm text-slate-500">
+                                        <span className="flex items-center gap-1 text-sm text-muted">
                                             <Icon name="calendar" className="h-4 w-4" /> {p.scheduled_display}
                                         </span>
                                     </div>
-                                    <p className="mt-2 line-clamp-3 whitespace-pre-line text-slate-800">
-                                        {p.body || <em className="text-slate-400">(no text)</em>}
+                                    <p className="mt-2 line-clamp-3 whitespace-pre-line text-fg">
+                                        {p.body || <em className="text-muted/80">(no text)</em>}
                                     </p>
                                 </div>
 
@@ -96,28 +96,28 @@ export default function Index({ tab, counts, posts }) {
                                         </Link>
                                     )}
                                     {p.cancellable && (
-                                        <button onClick={() => cancel(p)} className="btn-ghost btn-sm text-red-600 hover:bg-red-50">
+                                        <button onClick={() => cancel(p)} className="btn-ghost btn-sm text-red-700 dark:text-red-300 hover:bg-red-500/10">
                                             <Icon name="ban" className="h-3.5 w-3.5" /> Cancel
                                         </button>
                                     )}
                                 </div>
                             </div>
 
-                            <ul className="divide-y divide-slate-100 border-t border-slate-100 bg-slate-50/60">
+                            <ul className="divide-y divide-line border-t border-line bg-soft/60">
                                 {p.targets.map((t) => (
                                     <li key={t.id} className="flex flex-wrap items-center gap-3 px-4 py-3 sm:px-5">
                                         <PlatformIcon platform={t.platform} size="sm" />
                                         <div className="min-w-[10rem] flex-1">
                                             <div className="text-sm">
-                                                <span className="font-medium text-slate-800">{platforms[t.platform]}</span>{' '}
-                                                <span className="text-slate-500">· {t.account}</span>
+                                                <span className="font-medium text-fg">{platforms[t.platform]}</span>{' '}
+                                                <span className="text-muted">· {t.account}</span>
                                             </div>
-                                            {t.published_at && <div className="text-xs text-slate-500">Published {t.published_at}</div>}
+                                            {t.published_at && <div className="text-xs text-muted">Published {t.published_at}</div>}
                                             {t.error && (
-                                                <div className="mt-1 rounded-lg bg-red-50 px-2.5 py-1.5 text-xs text-red-700">{t.error}</div>
+                                                <div className="mt-1 rounded-lg bg-red-500/10 px-2.5 py-1.5 text-xs text-red-700 dark:text-red-300">{t.error}</div>
                                             )}
                                             {t.warning && (
-                                                <div className="mt-1 rounded-lg bg-amber-50 px-2.5 py-1.5 text-xs text-amber-700">{t.warning}</div>
+                                                <div className="mt-1 rounded-lg bg-amber-500/10 px-2.5 py-1.5 text-xs text-amber-700 dark:text-amber-300">{t.warning}</div>
                                             )}
                                         </div>
                                         <StatusBadge status={t.status} />
@@ -144,7 +144,7 @@ export default function Index({ tab, counts, posts }) {
                                     preserveScroll
                                     className={
                                         'rounded-lg px-3 py-1.5 text-sm ' +
-                                        (l.active ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50') +
+                                        (l.active ? 'bg-slate-900 text-white' : 'bg-panel text-muted ring-1 ring-line hover:bg-soft') +
                                         (l.url ? '' : ' pointer-events-none opacity-40')
                                     }
                                     dangerouslySetInnerHTML={{ __html: l.label }}

@@ -1,21 +1,32 @@
-import Icon from '@/Components/Icon';
+import { usePage } from '@inertiajs/react';
 
-export function BrandMark({ className = 'h-9 w-9' }) {
+/** The Techlo "Ti" mark (same artwork as techloit.com). */
+export function LogoMark({ className = 'size-9' }) {
     return (
-        <span
-            className={`inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30 ${className}`}
-        >
-            <Icon name="send" className="h-1/2 w-1/2" strokeWidth={2} />
-        </span>
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" className={`shrink-0 rounded-[10px] shadow-lg shadow-brand/25 ${className}`} aria-hidden="true">
+            <rect width="64" height="64" rx="14" fill="#010818" />
+            <rect x="9" y="15" width="34" height="9" rx="4.5" fill="#ffffff" />
+            <rect x="21" y="15" width="10" height="34" rx="5" fill="#ffffff" />
+            <rect x="47" y="24" width="9" height="25" rx="4.5" fill="#18a9e5" />
+            <circle cx="51.5" cy="15.5" r="4.5" fill="#18a9e5" />
+        </svg>
     );
 }
 
-export default function Brand({ dark = false }) {
+// Kept so older imports keep working.
+export const BrandMark = LogoMark;
+
+/** Logo + wordmark. The first word is plain, the rest uses the brand colour: "Techlo Post". */
+export default function Brand({ className = '' }) {
+    const name = usePage().props.appName || 'Techlo Post';
+    const [first, ...rest] = name.split(' ');
+
     return (
-        <span className="inline-flex items-center gap-3">
-            <BrandMark />
-            <span className={`text-lg font-bold tracking-tight ${dark ? 'text-white' : 'text-slate-900'}`}>
-                Just One Post
+        <span className={`inline-flex items-center gap-2.5 text-lg font-bold tracking-tight ${className}`}>
+            <LogoMark />
+            <span className="text-fg">
+                {first}
+                {rest.length > 0 && <span className="text-brand"> {rest.join(' ')}</span>}
             </span>
         </span>
     );

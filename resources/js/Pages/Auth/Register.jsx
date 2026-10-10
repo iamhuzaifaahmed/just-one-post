@@ -39,8 +39,8 @@ export default function Register({ firstUser }) {
         <GuestLayout>
             <Head title="Create account" />
 
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{firstUser ? 'Create the admin account' : 'Create your account'}</h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <h1 className="text-2xl font-bold tracking-tight text-fg">{firstUser ? 'Create the admin account' : 'Create your account'}</h1>
+            <p className="mt-1 text-sm text-muted">
                 Free to use. You will connect your own social accounts after signing up.
             </p>
 
@@ -55,9 +55,9 @@ export default function Register({ firstUser }) {
                 </PrimaryButton>
             </form>
 
-            <p className="mt-6 text-center text-sm text-slate-500">
+            <p className="mt-6 text-center text-sm text-muted">
                 Already registered?{' '}
-                <Link href={route('login')} className="font-medium text-indigo-600 hover:text-indigo-500">
+                <Link href={route('login')} className="font-medium text-brand hover:text-brand">
                     Log in
                 </Link>
             </p>

@@ -8,7 +8,7 @@ import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { MoreBn, MoreEn } from './More';
 import { DiscordBn, DiscordEn, TelegramBn, TelegramEn, ThreadsBn, ThreadsEn, WordPressBn, WordPressEn, XBn, XEn } from './Platforms';
-import { FixBn, LinkedInBn, LiveBn, MetaBn, PublicBn, StartHereBn, YouTubeBn } from './Bn';
+import { FixBn, LinkedInBn, MetaBn, PublicBn, StartHereBn, YouTubeBn } from './Bn';
 
 const TABS = [
     { id: 'start', en: 'Start here', bn: 'এখান থেকে শুরু', icon: <Icon name="book" className="h-5 w-5" /> },
@@ -22,7 +22,6 @@ const TABS = [
     { id: 'wordpress', en: 'WordPress', bn: 'WordPress', icon: <PlatformIcon platform="wordpress" size="sm" /> },
     { id: 'more', en: 'Add more accounts', bn: 'আরও অ্যাকাউন্ট যোগ করুন', icon: <Icon name="plus" className="h-5 w-5" /> },
     { id: 'public', en: 'Instagram public link', bn: 'Instagram পাবলিক লিংক', icon: <Icon name="globe" className="h-5 w-5" /> },
-    { id: 'live', en: 'Put it on your website', bn: 'ওয়েবসাইটে চালু করুন', icon: <Icon name="upload" className="h-5 w-5" /> },
     { id: 'fix', en: 'Something went wrong?', bn: 'সমস্যা হচ্ছে?', icon: <Icon name="alert" className="h-5 w-5" /> },
 ];
 
@@ -48,7 +47,7 @@ function StartHere({ setTab }) {
             </Words>
 
             <div>
-                <h3 className="mb-3 font-semibold text-slate-900">The 3 steps, for every platform</h3>
+                <h3 className="mb-3 font-semibold text-fg">The 3 steps, for every platform</h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     {[
                         ['1', 'Create the app', 'On the platform’s developer website. This guide shows every click.'],
@@ -56,17 +55,17 @@ function StartHere({ setTab }) {
                         ['3', 'Press Connect', 'Log in to your account and click Allow. Done. You never need to do it again (except every ~60 days for LinkedIn).'],
                     ].map(([n, t, d]) => (
                         <div key={n} className="card p-4">
-                            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white">{n}</span>
-                            <div className="mt-3 font-semibold text-slate-900">{t}</div>
-                            <p className="mt-1 text-sm text-slate-500">{d}</p>
+                            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-sm font-bold text-brand-fg">{n}</span>
+                            <div className="mt-3 font-semibold text-fg">{t}</div>
+                            <p className="mt-1 text-sm text-muted">{d}</p>
                         </div>
                     ))}
                 </div>
             </div>
 
             <div>
-                <h3 className="mb-3 font-semibold text-slate-900">Pick what you need</h3>
-                <p className="mb-3 text-sm text-slate-500">You do not have to set up everything. Do only the platforms you want to post on.</p>
+                <h3 className="mb-3 font-semibold text-fg">Pick what you need</h3>
+                <p className="mb-3 text-sm text-muted">You do not have to set up everything. Do only the platforms you want to post on.</p>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {[
                         ['linkedin', ['linkedin'], 'LinkedIn', 'Post on your personal profile.', '~15 min'],
@@ -85,22 +84,22 @@ function StartHere({ setTab }) {
                         >
                             <span className="flex -space-x-2">
                                 {icons.map((i) => (
-                                    <PlatformIcon key={i} platform={i} size="lg" className="ring-4 ring-white" />
+                                    <PlatformIcon key={i} platform={i} size="lg" className="ring-4 ring-panel" />
                                 ))}
                             </span>
                             <span className="min-w-0 flex-1">
-                                <span className="block font-semibold text-slate-900">{t}</span>
-                                <span className="block text-sm text-slate-500">{d}</span>
+                                <span className="block font-semibold text-fg">{t}</span>
+                                <span className="block text-sm text-muted">{d}</span>
                             </span>
-                            <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">{time}</span>
+                            <span className="shrink-0 rounded-full bg-soft px-2.5 py-1 text-xs font-medium text-muted">{time}</span>
                         </button>
                     ))}
                 </div>
             </div>
 
             <div>
-                <h3 className="mb-3 font-semibold text-slate-900">Before you begin, have these ready</h3>
-                <ul className="space-y-2 text-sm text-slate-700">
+                <h3 className="mb-3 font-semibold text-fg">Before you begin, have these ready</h3>
+                <ul className="space-y-2 text-sm text-fg/80">
                     {[
                         'The accounts you want to post on (you must be able to log in to each one).',
                         'A phone nearby: some sites send a text or email code when you sign in.',
@@ -278,7 +277,7 @@ function MetaGuide({ redirects }) {
                 </p>
             </Words>
 
-            <h3 className="font-semibold text-slate-900">Part A. Get your accounts ready</h3>
+            <h3 className="font-semibold text-fg">Part A. Get your accounts ready</h3>
             <Steps group="meta-a">
                 <Step title="Make sure you have a Facebook Page">
                     <p>
@@ -314,7 +313,7 @@ function MetaGuide({ redirects }) {
                 </Step>
             </Steps>
 
-            <h3 className="pt-2 font-semibold text-slate-900">Part B. Create the Meta app</h3>
+            <h3 className="pt-2 font-semibold text-fg">Part B. Create the Meta app</h3>
             <Steps group="meta-b">
                 <Step title="Open Meta for Developers and register">
                     <p>
@@ -624,7 +623,7 @@ function PublicGuide({ isLocal, publicBaseUrl, appUrl }) {
                 </Callout>
             )}
 
-            <h3 className="font-semibold text-slate-900">Option A (easiest to understand): use a free tunnel called ngrok</h3>
+            <h3 className="font-semibold text-fg">Option A (easiest to understand): use a free tunnel called ngrok</h3>
             <Steps group="public">
                 <Step title="Create a free ngrok account and install it">
                     <p>
@@ -663,8 +662,7 @@ function PublicGuide({ isLocal, publicBaseUrl, appUrl }) {
                         With the free plan the ngrok address <b>changes every time</b> you restart it. Paste the new one into Settings each time.
                     </li>
                     <li>
-                        For posts scheduled for later, ngrok must be running at the scheduled time. The permanent fix is to put this tool on your real website
-                        (next tab).
+                        For posts scheduled for later, ngrok must be running at the scheduled time.
                     </li>
                     <li>
                         Instagram accepts <b>JPG</b> pictures only (not PNG), and videos are posted as Reels.
@@ -676,69 +674,6 @@ function PublicGuide({ isLocal, publicBaseUrl, appUrl }) {
 }
 
 /* -------------------------------------------------------------------------- */
-
-function LiveGuide({ redirects }) {
-    return (
-        <Section
-            title="Put it on your real website (cPanel hosting)"
-            subtitle="Do this when everything works on your computer and you want posts to publish even when your PC is off."
-        >
-            <Words>
-                <p>
-                    Moving the tool to your hosting changes the web address, so the <b>Redirect URI</b> changes too. LinkedIn, Meta and Google only accept
-                    addresses you registered, so you must add the new one in each of them. Your Client IDs and Secrets stay the same.
-                </p>
-            </Words>
-
-            <Steps group="live">
-                <Step title="Upload the tool and set it up on the host">
-                    <p>
-                        The technical hosting steps (upload, database, <Val>.env</Val>, “Document root”, cron job) are written step by step in the{' '}
-                        <b>README.md</b> file inside the project folder, under <b>“Deploying to cPanel”</b>. Give that section to whoever manages your hosting.
-                        The most important part is the <b>cron job</b>: without it, scheduled posts will not be published.
-                    </p>
-                </Step>
-                <Step title="Find your new Redirect URIs">
-                    <p>
-                        After the tool is live, log in on your real website, open this guide again and copy the addresses below. They automatically use
-                        your new website address.
-                    </p>
-                    <div className="space-y-3">
-                        <CopyField label="LinkedIn" value={redirects.linkedin} />
-                        <CopyField label="Facebook / Instagram (Meta)" value={redirects.facebook} />
-                        <CopyField label="YouTube (Google)" value={redirects.youtube} />
-                        <CopyField label="Threads" value={redirects.threads} />
-                        <CopyField label="X (Twitter)" value={redirects.x} />
-                    </div>
-                </Step>
-                <Step title="Add them on each platform (do not delete the old ones)">
-                    <ul className="list-disc space-y-1.5 ps-5">
-                        <li>
-                            <b>LinkedIn:</b> developer page → your app → <UI>Auth</UI> → pencil next to <b>Authorized redirect URLs</b> → <UI>Add redirect URL</UI>.
-                        </li>
-                        <li>
-                            <b>Meta:</b> your app → <UI>Facebook Login</UI> → <UI>Settings</UI> → <b>Valid OAuth Redirect URIs</b> → add on a new line → <UI>Save changes</UI>.
-                        </li>
-                        <li>
-                            <b>Google:</b> Cloud Console → <UI>APIs & Services</UI> → <UI>Credentials</UI> → click your OAuth client → <b>Authorized redirect URIs</b> → <UI>+ Add URI</UI> → <UI>Save</UI>.
-                        </li>
-                    </ul>
-                </Step>
-                <Step title="Enter your Settings again on the live site">
-                    <p>
-                        The live website has its own empty database, so open <GoSettings /> there and paste the Client IDs and Secrets once more, then press{' '}
-                        <UI>Connect</UI> on each platform again. Leave <b>Public base URL</b> empty (Instagram will use your website address).
-                    </p>
-                </Step>
-              <Step title="Change the default password">
-                    <p>
-                        Before going live, open <b>Profile</b> and set a strong login password. An easy password lets anyone on the internet post to your social accounts.
-                    </p>
-                </Step>
-            </Steps>
-        </Section>
-    );
-}
 
 /* -------------------------------------------------------------------------- */
 
@@ -812,7 +747,7 @@ function FixGuide() {
                     [
                         'Instagram says the media is not public / mentions PUBLIC_BASE_URL',
                         <p key="a">
-                            Instagram cannot reach your computer. Follow the tab <b>“Instagram public link”</b>, or run the tool on your real website.
+                            Instagram cannot reach your computer. Follow the tab <b>“Instagram public link”</b>, or tell the administrator.
                         </p>,
                     ],
                     [
@@ -840,15 +775,9 @@ function FixGuide() {
                         'Posts do not go out at the scheduled time',
                         <ul key="a" className="list-disc space-y-1 ps-5">
                             <li>
-                                <b>On your computer:</b> the scheduler window must be running (the black window started with <Val>php artisan schedule:work</Val>)
-                                and the computer must be on.
+                                Check the time zone in <GoSettings /> (General → Display timezone). Times are entered in that zone.
                             </li>
-                            <li>
-                                <b>On your hosting:</b> the cron job (“every minute”) must be set up in cPanel. See the README.
-                            </li>
-                            <li>
-                                Check the time zone in <GoSettings /> (General → Display timezone).
-                            </li>
+                            <li>If several posts are late, tell the administrator: the server’s scheduler may have stopped.</li>
                         </ul>,
                     ],
                 ]}
@@ -907,7 +836,6 @@ export default function Index({ tab, appUrl, isLocal, redirects, publicBaseUrl }
         ) : (
             <PublicGuide isLocal={isLocal} publicBaseUrl={publicBaseUrl} appUrl={appUrl} />
         ),
-        live: bn ? <LiveBn redirects={redirects} /> : <LiveGuide redirects={redirects} />,
         fix: bn ? <FixBn /> : <FixGuide />,
     }[active];
 
@@ -922,7 +850,7 @@ export default function Index({ tab, appUrl, isLocal, redirects, publicBaseUrl }
                             : 'Step-by-step help for connecting each platform. No technical knowledge needed.'
                     }
                     actions={
-                        <div className="inline-flex rounded-xl bg-slate-200/70 p-1 text-sm font-medium">
+                        <div className="inline-flex rounded-xl bg-line/70 p-1 text-sm font-medium">
                             {[
                                 ['bn', 'বাংলা'],
                                 ['en', 'English'],
@@ -932,7 +860,7 @@ export default function Index({ tab, appUrl, isLocal, redirects, publicBaseUrl }
                                     onClick={() => setLang(code)}
                                     className={
                                         'rounded-lg px-3.5 py-1.5 transition ' +
-                                        (lang === code ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900')
+                                        (lang === code ? 'bg-panel text-fg shadow-sm' : 'text-muted hover:text-fg')
                                     }
                                 >
                                     {label}
@@ -955,11 +883,11 @@ export default function Index({ tab, appUrl, isLocal, redirects, publicBaseUrl }
                                 className={
                                     'flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-medium transition ' +
                                     (active === t.id
-                                        ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-                                        : 'text-slate-600 hover:bg-white/70')
+                                        ? 'bg-panel text-fg shadow-sm ring-1 ring-line'
+                                        : 'text-muted hover:bg-panel/70')
                                 }
                             >
-                                <span className="flex h-6 w-6 items-center justify-center text-slate-500">{t.icon}</span>
+                                <span className="flex h-6 w-6 items-center justify-center text-muted">{t.icon}</span>
                                 {t[lang]}
                             </button>
                         ))}

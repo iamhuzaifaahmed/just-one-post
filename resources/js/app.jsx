@@ -1,25 +1,39 @@
 import '../css/app.css';
 import './bootstrap';
 
-import { createInertiaApp } from '@inertiajs/react';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'Techlo Post';
+
+// Every page is bundled into the main file (eager), so going from one page to another never has to
+// download a JavaScript chunk. Together with link prefetching this makes navigation feel instant.
+const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true });
 
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.jsx`,
-            import.meta.glob('./Pages/**/*.jsx'),
-        ),
+    title: (title) => (title ? `${title} - ${appName}` : appName),
+    resolve: (name) => {
+        const page = pages[`./Pages/${name}.jsx`];
+        if (!page) {
+            throw new Error(`Page not found: ${name}`);
+        }
+        return page;
+    },
     setup({ el, App, props }) {
-        const root = createRoot(el);
+        createRoot(el).render(<App {...props} />);
+    },
+    // No top loading bar: pages swap in place.
+    progress: false,
+});
 
-        root.render(<App {...props} />);
-    },
-    progress: {
-        color: '#4B5563',
-    },
+// Prefetched pages are served from memory. After anything is changed (a POST/PUT/PATCH/DELETE)
+// forget them, so a list never shows stale data.
+let lastMethod = 'get';
+router.on('start', (event) => {
+    lastMethod = event.detail.visit.method;
+});
+router.on('success', () => {
+    if (lastMethod !== 'get') {
+        router.flushAll();
+    }
 });

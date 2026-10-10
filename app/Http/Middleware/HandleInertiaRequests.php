@@ -43,6 +43,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'timezone' => config('social.display_timezone'),
             'platforms' => config('social.platforms'),
+            'appName' => config('app.name'),
         ];
     }
 }

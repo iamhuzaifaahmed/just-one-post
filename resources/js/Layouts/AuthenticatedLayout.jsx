@@ -1,5 +1,6 @@
 import Brand from '@/Components/Brand';
 import Icon from '@/Components/Icon';
+import ThemeToggle from '@/Components/ThemeToggle';
 import Toast from '@/Components/Toast';
 import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -30,14 +31,16 @@ function NavItem({ item, onClick }) {
         <Link
             href={item.href()}
             onClick={onClick}
+            // Loaded in the background as soon as the menu appears and kept for a while, so the click
+            // shows the page at once and refreshes it quietly afterwards (stale-while-revalidate).
+            prefetch="mount"
+            cacheFor={['30s', '5m']}
             className={
                 'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ' +
-                (active
-                    ? 'bg-white/10 text-white shadow-inner'
-                    : 'text-slate-400 hover:bg-white/5 hover:text-white')
+                (active ? 'bg-brand/10 text-brand' : 'text-muted hover:bg-soft hover:text-fg')
             }
         >
-            <Icon name={item.icon} className={'h-5 w-5 ' + (active ? 'text-indigo-300' : 'text-slate-500 group-hover:text-slate-300')} />
+            <Icon name={item.icon} className={'size-5 ' + (active ? 'text-brand' : 'text-muted group-hover:text-fg')} />
             {item.label}
         </Link>
     );
@@ -45,19 +48,19 @@ function NavItem({ item, onClick }) {
 
 function Sidebar({ user, onNavigate }) {
     return (
-        <div className="flex h-full flex-col bg-slate-900 px-4 py-5">
+        <div className="flex h-full flex-col border-r border-line bg-panel px-4 py-5">
             <Link href={route('dashboard')} className="px-2" onClick={onNavigate}>
-                <Brand dark />
+                <Brand />
             </Link>
 
-            <nav className="mt-8 flex-1 space-y-1">
+            <nav className="mt-8 flex-1 space-y-1 overflow-y-auto">
                 {NAV.map((item) => (
                     <NavItem key={item.label} item={item} onClick={onNavigate} />
                 ))}
 
                 {user.is_admin && (
                     <>
-                        <div className="px-3 pb-1 pt-6 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Admin</div>
+                        <div className="eyebrow px-3 pb-1 pt-6 !text-muted before:!bg-muted/60">Admin</div>
                         {ADMIN_NAV.map((item) => (
                             <NavItem key={item.label} item={item} onClick={onNavigate} />
                         ))}
@@ -65,32 +68,36 @@ function Sidebar({ user, onNavigate }) {
                 )}
             </nav>
 
-            <div className="rounded-2xl bg-white/5 p-3">
+            <div className="mt-4 rounded-2xl border border-line bg-soft p-3">
                 <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-fuchsia-400 text-sm font-bold text-white">
+                    <span className="flex size-9 items-center justify-center rounded-full bg-brand text-sm font-bold text-brand-fg">
                         {user.name?.charAt(0).toUpperCase()}
                     </span>
                     <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium text-white">{user.name}</div>
-                        <div className="truncate text-xs text-slate-400">{user.email}</div>
+                        <div className="truncate text-sm font-medium text-fg">{user.name}</div>
+                        <div className="truncate text-xs text-muted">{user.email}</div>
                     </div>
                 </div>
-                <div className="mt-3 flex gap-2">
+                <div className="mt-3 flex items-center gap-2">
                     <Link
                         href={route('profile.edit')}
                         onClick={onNavigate}
-                        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-white/5 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/10"
+                        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-line bg-panel py-1.5 text-xs font-medium text-fg hover:bg-canvas"
                     >
-                        <Icon name="user" className="h-3.5 w-3.5" /> Profile
+                        <Icon name="user" className="size-3.5" /> Profile
                     </Link>
                     <Link
                         href={route('logout')}
                         method="post"
                         as="button"
-                        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-white/5 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/10"
+                        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-line bg-panel py-1.5 text-xs font-medium text-fg hover:bg-canvas"
                     >
-                        <Icon name="logout" className="h-3.5 w-3.5" /> Log out
+                        <Icon name="logout" className="size-3.5" /> Log out
                     </Link>
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                    <span className="eyebrow !tracking-[0.16em] !text-muted before:!hidden">Theme</span>
+                    <ThemeToggle />
                 </div>
             </div>
         </div>
@@ -106,22 +113,27 @@ export default function AuthenticatedLayout({ header, children }) {
     useEffect(() => setOpen(false), [url]);
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-soft">
             {/* Desktop sidebar */}
             <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 lg:block">
                 <Sidebar user={auth.user} />
             </aside>
 
             {/* Mobile top bar + drawer */}
-            <div className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur lg:hidden">
-                <Brand />
-                <button onClick={() => setOpen(true)} className="rounded-lg p-2 text-slate-600 hover:bg-slate-100" aria-label="Open menu">
-                    <Icon name="menu" />
-                </button>
+            <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-line bg-panel/90 px-4 py-3 backdrop-blur lg:hidden">
+                <Link href={route('dashboard')}>
+                    <Brand />
+                </Link>
+                <div className="flex items-center gap-2">
+                    <ThemeToggle />
+                    <button onClick={() => setOpen(true)} className="rounded-lg border border-line p-2 text-fg hover:bg-soft" aria-label="Open menu">
+                        <Icon name="menu" className="size-5" />
+                    </button>
+                </div>
             </div>
             {open && (
                 <div className="fixed inset-0 z-40 lg:hidden">
-                    <div className="absolute inset-0 bg-slate-900/50" onClick={() => setOpen(false)} />
+                    <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
                     <div className="absolute inset-y-0 left-0 w-72 max-w-[85%] shadow-2xl">
                         <Sidebar user={auth.user} onNavigate={() => setOpen(false)} />
                     </div>
@@ -144,8 +156,10 @@ export default function AuthenticatedLayout({ header, children }) {
                 </div>
             )}
 
-            <main className="min-w-0 lg:pl-64">
-                <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+            <main className="relative min-w-0 lg:pl-64">
+                {/* Soft brand glow behind the page header, as on techloit.com */}
+                <div className="glow pointer-events-none absolute inset-x-0 top-0 h-72 opacity-70" aria-hidden="true" />
+                <div className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
                     {header}
                     {children}
                 </div>

@@ -33,10 +33,10 @@ export default function Settings({ fields, registrationOpen }) {
                 <section className="card p-5 sm:p-6">
                     <div className="flex items-start justify-between gap-4">
                         <div>
-                            <h2 className="font-semibold text-slate-900">Registration</h2>
-                            <p className="mt-1 text-sm text-slate-500">
+                            <h2 className="font-semibold text-fg">Registration</h2>
+                            <p className="mt-1 text-sm text-muted">
                                 {data.registration_open
-                                    ? 'Anyone can create an account. The landing page shows “Get started”.'
+                                    ? 'Anyone can create an account. The login page shows a “Create your account” link.'
                                     : 'Sign-ups are closed. Existing users can still log in.'}
                             </p>
                         </div>
@@ -45,21 +45,21 @@ export default function Settings({ fields, registrationOpen }) {
                             role="switch"
                             aria-checked={data.registration_open}
                             onClick={() => setData('registration_open', !data.registration_open)}
-                            className={'relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition ' + (data.registration_open ? 'bg-indigo-600' : 'bg-slate-300')}
+                            className={'relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition ' + (data.registration_open ? 'bg-brand' : 'bg-line')}
                         >
-                            <span className={'inline-block h-5 w-5 rounded-full bg-white shadow transition ' + (data.registration_open ? 'translate-x-6' : 'translate-x-1')} />
+                            <span className={'inline-block h-5 w-5 rounded-full bg-panel shadow transition ' + (data.registration_open ? 'translate-x-6' : 'translate-x-1')} />
                         </button>
                     </div>
                 </section>
 
                 <section className="card space-y-5 p-5 sm:p-6">
-                    <h2 className="font-semibold text-slate-900">Publishing</h2>
+                    <h2 className="font-semibold text-fg">Publishing</h2>
                     {Object.keys(fields).map((k) => (
                         <div key={k}>
                             <label className="label flex items-center gap-2">
                                 {FIELD_META[k].label}
                                 {fields[k].set && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-300">
                                         <Icon name="check" className="h-3 w-3" strokeWidth={3} /> saved
                                     </span>
                                 )}
@@ -77,9 +77,9 @@ export default function Settings({ fields, registrationOpen }) {
                     ))}
                 </section>
 
-                <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/90 px-4 py-3 backdrop-blur lg:left-64">
+                <div className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-panel/90 px-4 py-3 backdrop-blur lg:left-64">
                     <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 lg:px-4">
-                        <span className="text-sm text-slate-500">{isDirty ? 'You have unsaved changes.' : 'All changes saved.'}</span>
+                        <span className="text-sm text-muted">{isDirty ? 'You have unsaved changes.' : 'All changes saved.'}</span>
                         <button type="submit" disabled={processing || !isDirty} className="btn-primary">
                             {processing ? 'Saving…' : 'Save settings'}
                         </button>

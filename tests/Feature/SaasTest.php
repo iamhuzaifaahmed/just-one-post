@@ -82,9 +82,9 @@ class SaasTest extends TestCase
         $this->get('/register')->assertOk();
     }
 
-    public function test_guests_see_the_landing_page_and_signed_in_users_go_to_the_dashboard(): void
+    public function test_the_root_url_sends_guests_to_login_and_users_to_the_dashboard(): void
     {
-        $this->get('/')->assertOk()->assertInertia(fn (Assert $p) => $p->component('Welcome')->where('canRegister', true));
+        $this->get('/')->assertRedirect('/login');
         $this->actingAs($this->user())->get('/')->assertRedirect('/dashboard');
     }
 
