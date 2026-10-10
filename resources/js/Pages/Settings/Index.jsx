@@ -66,7 +66,7 @@ const GROUPS = [
                 <Icon name="globe" />
             </span>
         ),
-        help: 'Instagram downloads your media from the public base URL, so it must be reachable from the internet (ngrok, cloudflared or your live domain).',
+        help: 'Times in the composer and post list use this timezone. Everything is stored in UTC.',
         fields: ['public_base_url', 'display_timezone'],
     },
     {
@@ -122,14 +122,16 @@ export default function Index({ fields, redirects, timezones }) {
             header={
                 <PageHeader
                     title="Settings"
-                    subtitle="Credentials and options. Secrets are encrypted and never shown again after saving."
+                    subtitle="Your own developer-app credentials and timezone. Secrets are encrypted and never shown again after saving."
                 />
             }
         >
             <Head title="Settings" />
 
             <form onSubmit={submit} className="max-w-3xl space-y-6 pb-24">
-                {GROUPS.map((g) => (
+                {GROUPS.map((g) => ({ ...g, fields: g.fields.filter((f) => fields[f]) }))
+                    .filter((g) => g.fields.length > 0)
+                    .map((g) => (
                     <section key={g.id} className="card p-5 sm:p-6">
                         <div className="flex items-center gap-3">
                             {g.icon}

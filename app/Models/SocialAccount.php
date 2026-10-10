@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToUser;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SocialAccount extends Model
 {
+    use BelongsToUser;
+
     public const ACTIVE = 'active';
     public const NEEDS_RECONNECT = 'needs_reconnect';
 
     protected $fillable = [
-        'platform', 'external_id', 'display_name', 'label', 'access_token', 'refresh_token',
+        'user_id', 'platform', 'external_id', 'display_name', 'label', 'access_token', 'refresh_token',
         'token_expires_at', 'meta', 'status', 'status_message',
     ];
 

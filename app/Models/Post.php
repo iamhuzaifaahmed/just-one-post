@@ -2,13 +2,26 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToUser;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
 class Post extends Model
 {
-    protected $fillable = ['body', 'scheduled_at', 'media_path', 'media_type', 'media_mime', 'status'];
+    use BelongsToUser;
+
+    protected $fillable = ['user_id', 'body', 'scheduled_at', 'media_path', 'media_type', 'media_mime', 'status'];
+
+    protected static function booted(): void
+    {
+        // Don't leave orphaned uploads behind when a post (or its owner) is deleted.
+        static::deleted(function (Post $post) {
+            if ($post->media_path) {
+                Storage::disk('public')->delete($post->media_path);
+            }
+        });
+    }
 
     protected function casts(): array
     {

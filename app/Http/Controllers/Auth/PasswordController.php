@@ -15,6 +15,8 @@ class PasswordController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
+        abort_if($request->session()->has('impersonator_id'), 403, 'Not allowed while signed in as another user.');
+
         $validated = $request->validate([
             'current_password' => ['required', 'current_password'],
             'password' => ['required', Password::defaults(), 'confirmed'],

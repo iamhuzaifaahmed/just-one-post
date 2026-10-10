@@ -18,18 +18,6 @@ class PostFlowTest extends TestCase
 {
     use MakesPosts, RefreshDatabase;
 
-    public function test_registration_is_open_only_until_first_user_exists(): void
-    {
-        $this->get('/register')->assertOk();
-
-        User::factory()->create();
-
-        $this->get('/register')->assertNotFound();
-        $this->post('/register', ['name' => 'x', 'email' => 'x@x.com', 'password' => 'password123', 'password_confirmation' => 'password123'])
-            ->assertNotFound();
-        $this->assertSame(1, User::count());
-    }
-
     public function test_guests_are_redirected_to_login(): void
     {
         $this->get('/posts')->assertRedirect('/login');
@@ -38,7 +26,7 @@ class PostFlowTest extends TestCase
 
     public function test_scheduling_converts_dhaka_time_to_utc(): void
     {
-        $user = User::factory()->create();
+        $user = $this->owner();
         $acc = $this->account('linkedin');
 
         $this->actingAs($user)->post('/posts', [
@@ -58,7 +46,7 @@ class PostFlowTest extends TestCase
     public function test_publish_now_queues_immediately(): void
     {
         Queue::fake();
-        $user = User::factory()->create();
+        $user = $this->owner();
         $acc = $this->account('linkedin');
 
         $this->actingAs($user)->post('/posts', [
@@ -70,7 +58,7 @@ class PostFlowTest extends TestCase
 
     public function test_platform_validation_rejects_instagram_without_media_and_long_linkedin_text(): void
     {
-        $user = User::factory()->create();
+        $user = $this->owner();
         $ig = $this->account('instagram');
         $li = $this->account('linkedin');
 
@@ -86,7 +74,7 @@ class PostFlowTest extends TestCase
     public function test_media_upload_is_stored_and_typed(): void
     {
         Storage::fake('public');
-        $user = User::factory()->create();
+        $user = $this->owner();
         $acc = $this->account('linkedin');
 
         $this->actingAs($user)->post('/posts', [
@@ -104,7 +92,7 @@ class PostFlowTest extends TestCase
     public function test_cancel_edit_and_retry(): void
     {
         Queue::fake();
-        $user = User::factory()->create();
+        $user = $this->owner();
         $acc = $this->account('linkedin');
         $target = $this->target($acc, ['scheduled_at' => now()->addDay()], target: ['run_at' => now()->addDay()]);
         $post = $target->post;
@@ -132,7 +120,7 @@ class PostFlowTest extends TestCase
 
     public function test_published_posts_cannot_be_edited(): void
     {
-        $user = User::factory()->create();
+        $user = $this->owner();
         $target = $this->target($this->account('linkedin'), target: ['status' => 'published', 'external_post_id' => 'x']);
 
         $this->actingAs($user)->post("/posts/{$target->post_id}", [
@@ -143,7 +131,7 @@ class PostFlowTest extends TestCase
 
     public function test_connection_callback_stores_linkedin_account_encrypted(): void
     {
-        $user = User::factory()->create();
+        $user = $this->owner();
         $socialite = new \Laravel\Socialite\Two\User;
         $socialite->id = 'sub-123';
         $socialite->name = 'Huz';
@@ -166,7 +154,7 @@ class PostFlowTest extends TestCase
 
     public function test_facebook_callback_creates_page_and_instagram_accounts(): void
     {
-        $user = User::factory()->create();
+        $user = $this->owner();
         config(['services.facebook.client_id' => 'cid', 'services.facebook.client_secret' => 'sec']);
         $socialite = new \Laravel\Socialite\Two\User;
         $socialite->token = 'short-user-token';

@@ -45,11 +45,18 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        abort_if($request->session()->has('impersonator_id'), 403, 'Not allowed while signed in as another user.');
+
         $request->validate([
             'password' => ['required', 'current_password'],
         ]);
 
         $user = $request->user();
+
+        // Never leave the installation without an admin.
+        if ($user->is_admin && \App\Models\User::where('is_admin', true)->count() <= 1) {
+            return back()->withErrors(['password' => 'You are the only admin. Make someone else an admin before deleting this account.'], 'userDeletion');
+        }
 
         Auth::logout();
 

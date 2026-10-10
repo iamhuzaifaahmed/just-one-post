@@ -31,6 +31,13 @@ class PostTarget extends Model
 
     protected static function booted(): void
     {
+        // Tenant isolation: while a user is signed in, only targets of their own posts are visible.
+        static::addGlobalScope('owner', function (\Illuminate\Database\Eloquent\Builder $query) {
+            if (auth()->id() !== null) {
+                $query->whereIn('post_targets.post_id', Post::query()->select('posts.id'));
+            }
+        });
+
         // Keep the aggregate post status in sync.
         static::saved(fn (PostTarget $t) => $t->post?->refreshStatus());
     }

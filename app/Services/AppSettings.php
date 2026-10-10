@@ -3,31 +3,41 @@
 namespace App\Services;
 
 use App\Models\Setting;
+use App\Models\User;
 use Throwable;
 
 /**
- * Credentials and options editable from the dashboard (stored encrypted in the DB).
- * Values saved here override the matching .env/config defaults.
+ * Settings edited from the dashboard, stored encrypted in the database.
+ *
+ *  - "user" scope: each user's own developer-app credentials (bring your own keys) and timezone.
+ *  - "global" scope: app-wide options edited by an admin (public base URL, API versions, ...).
+ *
+ * Saved values override the matching .env/config defaults. Regular users never fall back to
+ * the server's .env credentials; admins (the owner of the install) still do.
  */
 class AppSettings
 {
-    /** key => [config path, is secret, group, label] */
+    public const USER = 'user';
+    public const GLOBAL = 'global';
+
+    /** key => [config path, is secret, group, label, scope] */
     public const FIELDS = [
-        'linkedin_client_id' => ['services.linkedin-openid.client_id', false, 'linkedin', 'Client ID'],
-        'linkedin_client_secret' => ['services.linkedin-openid.client_secret', true, 'linkedin', 'Client Secret'],
-        'facebook_client_id' => ['services.facebook.client_id', false, 'facebook', 'App ID'],
-        'facebook_client_secret' => ['services.facebook.client_secret', true, 'facebook', 'App Secret'],
-        'google_client_id' => ['services.google.client_id', false, 'google', 'Client ID'],
-        'google_client_secret' => ['services.google.client_secret', true, 'google', 'Client Secret'],
-        'threads_client_id' => ['services.threads.client_id', false, 'threads', 'Threads App ID'],
-        'threads_client_secret' => ['services.threads.client_secret', true, 'threads', 'Threads App Secret'],
-        'x_client_id' => ['services.x.client_id', false, 'x', 'Client ID'],
-        'x_client_secret' => ['services.x.client_secret', true, 'x', 'Client Secret'],
-        'public_base_url' => ['social.public_base_url', false, 'general', 'Public base URL (for Instagram and Threads media)'],
-        'display_timezone' => ['social.display_timezone', false, 'general', 'Display timezone'],
-        'meta_graph_version' => ['social.graph_version', false, 'advanced', 'Meta Graph API version'],
-        'linkedin_api_version' => ['social.linkedin_version', false, 'advanced', 'LinkedIn API version (YYYYMM)'],
-        'ffprobe_path' => ['social.ffprobe_path', false, 'advanced', 'ffprobe path (optional)'],
+        'linkedin_client_id' => ['services.linkedin-openid.client_id', false, 'linkedin', 'Client ID', self::USER],
+        'linkedin_client_secret' => ['services.linkedin-openid.client_secret', true, 'linkedin', 'Client Secret', self::USER],
+        'facebook_client_id' => ['services.facebook.client_id', false, 'facebook', 'App ID', self::USER],
+        'facebook_client_secret' => ['services.facebook.client_secret', true, 'facebook', 'App Secret', self::USER],
+        'google_client_id' => ['services.google.client_id', false, 'google', 'Client ID', self::USER],
+        'google_client_secret' => ['services.google.client_secret', true, 'google', 'Client Secret', self::USER],
+        'threads_client_id' => ['services.threads.client_id', false, 'threads', 'Threads App ID', self::USER],
+        'threads_client_secret' => ['services.threads.client_secret', true, 'threads', 'Threads App Secret', self::USER],
+        'x_client_id' => ['services.x.client_id', false, 'x', 'Client ID', self::USER],
+        'x_client_secret' => ['services.x.client_secret', true, 'x', 'Client Secret', self::USER],
+        'display_timezone' => ['social.display_timezone', false, 'general', 'Display timezone', self::USER],
+
+        'public_base_url' => ['social.public_base_url', false, 'general', 'Public base URL (for Instagram and Threads media)', self::GLOBAL],
+        'meta_graph_version' => ['social.graph_version', false, 'advanced', 'Meta Graph API version', self::GLOBAL],
+        'linkedin_api_version' => ['social.linkedin_version', false, 'advanced', 'LinkedIn API version (YYYYMM)', self::GLOBAL],
+        'ffprobe_path' => ['social.ffprobe_path', false, 'advanced', 'ffprobe path (optional)', self::GLOBAL],
     ];
 
     /** OAuth redirect URIs are derived from the current host, not stored. */
@@ -39,7 +49,16 @@ class AppSettings
         'services.x.redirect' => '/connections/x/callback',
     ];
 
-    /** Push saved values into config(). Safe to call before migrations have run. */
+    private const REGISTRATION_KEY = 'registration_open';
+
+    private static function query(?int $userId)
+    {
+        $q = Setting::query();
+
+        return $userId === null ? $q->whereNull('user_id') : $q->where('user_id', $userId);
+    }
+
+    /** Boot-time: redirect URIs and the admin's global options. Safe before migrations have run. */
     public static function apply(): void
     {
         foreach (self::REDIRECTS as $path => $uri) {
@@ -47,9 +66,9 @@ class AppSettings
         }
 
         try {
-            foreach (Setting::all() as $setting) {
+            foreach (self::query(null)->get() as $setting) {
                 $field = self::FIELDS[$setting->key] ?? null;
-                if ($field && filled($setting->value)) {
+                if ($field && $field[4] === self::GLOBAL && filled($setting->value)) {
                     config([$field[0] => $setting->value]);
                 }
             }
@@ -58,18 +77,59 @@ class AppSettings
         }
     }
 
-    /** @return array<string,mixed> */
-    public static function forForm(): array
+    /**
+     * Make the config reflect one user's own credentials/timezone. Call it per request (middleware)
+     * and per job. Whatever the previous call changed is put back first, so a long-running queue
+     * worker never leaks one user's keys into another user's job.
+     */
+    public static function applyForUser(?User $user): void
     {
-        $saved = [];
-        try {
-            $saved = Setting::pluck('value', 'key')->all();
-        } catch (Throwable) {
+        $overlay = app()->bound('appsettings.overlay') ? app('appsettings.overlay') : [];
+        foreach ($overlay as $path => $previous) {
+            config([$path => $previous]);
+        }
+        $overlay = [];
+
+        $set = function (string $path, mixed $value) use (&$overlay) {
+            if (! array_key_exists($path, $overlay)) {
+                $overlay[$path] = config($path);
+            }
+            config([$path => $value]);
+        };
+
+        if ($user) {
+            if (! $user->is_admin) {
+                // Bring your own keys: regular users start with no credentials at all.
+                foreach (self::FIELDS as [$path, , $group, , $scope]) {
+                    if ($scope === self::USER && $group !== 'general') {
+                        $set($path, null);
+                    }
+                }
+            }
+
+            try {
+                foreach (self::query($user->id)->get() as $setting) {
+                    $field = self::FIELDS[$setting->key] ?? null;
+                    if ($field && $field[4] === self::USER && filled($setting->value)) {
+                        $set($field[0], $setting->value);
+                    }
+                }
+            } catch (Throwable) {
+            }
         }
 
+        app()->instance('appsettings.overlay', $overlay);
+    }
+
+    /** @return array<string,mixed> form state for the fields of one scope (secrets are never returned) */
+    public static function forForm(string $scope): array
+    {
         $out = [];
-        foreach (self::FIELDS as $key => [$path, $secret]) {
-            $current = filled($saved[$key] ?? null) ? $saved[$key] : config($path);
+        foreach (self::FIELDS as $key => [$path, $secret, , , $fieldScope]) {
+            if ($fieldScope !== $scope) {
+                continue;
+            }
+            $current = config($path);
             $isPlaceholder = is_string($current) && str_starts_with($current, 'your-');
             $out[$key] = $secret
                 ? ['secret' => true, 'set' => filled($current) && ! $isPlaceholder, 'value' => '']
@@ -79,29 +139,43 @@ class AppSettings
         return $out;
     }
 
-    /** Save submitted values; blank secrets keep the stored value. */
-    public static function save(array $input): void
+    /** Save submitted values for one scope; blank secrets keep the stored value. */
+    public static function save(array $input, string $scope, ?User $user = null): void
     {
-        foreach (self::FIELDS as $key => [, $secret]) {
-            if (! array_key_exists($key, $input)) {
+        $userId = $scope === self::USER ? $user?->id : null;
+
+        foreach (self::FIELDS as $key => [, $secret, , , $fieldScope]) {
+            if ($fieldScope !== $scope || ! array_key_exists($key, $input)) {
                 continue;
             }
             $value = trim((string) $input[$key]);
             if ($value === '') {
                 if (! $secret) {
-                    Setting::where('key', $key)->delete(); // cleared -> fall back to .env default
+                    self::query($userId)->where('key', $key)->delete(); // cleared -> fall back to the default
                 }
 
                 continue;
             }
-            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            Setting::updateOrCreate(['user_id' => $userId, 'key' => $key], ['value' => $value]);
         }
 
-        self::apply();
+        $scope === self::USER ? self::applyForUser($user) : self::apply();
     }
 
-    public static function clear(string $key): void
+    public static function registrationOpen(): bool
     {
-        Setting::where('key', $key)->delete();
+        try {
+            // Open unless an admin switched it off. The very first account can always register.
+            $value = self::query(null)->where('key', self::REGISTRATION_KEY)->first()?->value;
+
+            return $value === null || $value === '1';
+        } catch (Throwable) {
+            return true;
+        }
+    }
+
+    public static function setRegistrationOpen(bool $open): void
+    {
+        Setting::updateOrCreate(['user_id' => null, 'key' => self::REGISTRATION_KEY], ['value' => $open ? '1' : '0']);
     }
 }

@@ -5,7 +5,7 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Register() {
+export default function Register({ firstUser }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         email: '',
@@ -39,9 +39,9 @@ export default function Register() {
         <GuestLayout>
             <Head title="Create account" />
 
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Create your account</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{firstUser ? 'Create the admin account' : 'Create your account'}</h1>
             <p className="mt-1 text-sm text-slate-500">
-                This is a single-user app: registration closes automatically after this account is created.
+                Free to use. You will connect your own social accounts after signing up.
             </p>
 
             <form onSubmit={submit} className="mt-8 space-y-5">

@@ -5,13 +5,28 @@ namespace Tests\Concerns;
 use App\Models\Post;
 use App\Models\PostTarget;
 use App\Models\SocialAccount;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 
 trait MakesPosts
 {
+    private ?User $ownerUser = null;
+
+    /** The user that owns everything the helpers create (and that tests sign in as). */
+    protected function owner(): User
+    {
+        if (! $this->ownerUser) {
+            $this->ownerUser = User::factory()->create();
+            $this->ownerUser->forceFill(['is_admin' => true])->save();
+        }
+
+        return $this->ownerUser;
+    }
+
     protected function account(string $platform, array $attrs = []): SocialAccount
     {
         return SocialAccount::create(array_merge([
+            'user_id' => $this->owner()->id,
             'platform' => $platform,
             'external_id' => match ($platform) {
                 'linkedin' => 'abc123',
@@ -57,6 +72,7 @@ trait MakesPosts
         [$path, $type, $mime] = $media ? $this->media($media) : [null, null, null];
 
         $p = Post::create(array_merge([
+            'user_id' => $this->owner()->id,
             'body' => 'Hello world',
             'scheduled_at' => now()->subMinute(),
             'media_path' => $path,

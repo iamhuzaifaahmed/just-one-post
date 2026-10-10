@@ -18,7 +18,7 @@ class NewPlatformConnectionsTest extends TestCase
 
     private function me(): User
     {
-        return User::factory()->create();
+        return $this->owner();
     }
 
     /* ------------------------------ Telegram ------------------------------ */
@@ -240,22 +240,4 @@ class NewPlatformConnectionsTest extends TestCase
         $this->assertSame('needs_reconnect', $account->fresh()->status);
     }
 
-    /* ------------------------------ settings ------------------------------ */
-
-    public function test_threads_and_x_credentials_can_be_saved_from_settings(): void
-    {
-        $this->actingAs($this->me())->put('/settings', [
-            'threads_client_id' => 'tid', 'threads_client_secret' => 'tsec',
-            'x_client_id' => 'xid', 'x_client_secret' => 'xsec',
-        ])->assertRedirect();
-
-        config(['services.threads.client_id' => 'env', 'services.x.client_id' => 'env']);
-        \App\Services\AppSettings::apply();
-
-        $this->assertSame('tid', config('services.threads.client_id'));
-        $this->assertSame('tsec', config('services.threads.client_secret'));
-        $this->assertSame('xid', config('services.x.client_id'));
-        $this->assertStringEndsWith('/connections/x/callback', config('services.x.redirect'));
-        $this->assertStringEndsWith('/connections/threads/callback', config('services.threads.redirect'));
-    }
 }

@@ -9,12 +9,13 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/** A user's own developer-app credentials (bring your own keys) and display timezone. */
 class SettingsController extends Controller
 {
     public function index(): Response
     {
         return Inertia::render('Settings/Index', [
-            'fields' => AppSettings::forForm(),
+            'fields' => AppSettings::forForm(AppSettings::USER),
             'redirects' => [
                 'linkedin' => url('/connections/linkedin/callback'),
                 'facebook' => url('/connections/facebook/callback'),
@@ -39,14 +40,10 @@ class SettingsController extends Controller
             'threads_client_secret' => ['nullable', 'string', 'max:255'],
             'x_client_id' => ['nullable', 'string', 'max:255'],
             'x_client_secret' => ['nullable', 'string', 'max:255'],
-            'public_base_url' => ['nullable', 'url', 'max:255'],
             'display_timezone' => ['nullable', Rule::in(\DateTimeZone::listIdentifiers())],
-            'meta_graph_version' => ['nullable', 'regex:/^v\d+\.\d+$/'],
-            'linkedin_api_version' => ['nullable', 'regex:/^\d{6}$/'],
-            'ffprobe_path' => ['nullable', 'string', 'max:255'],
         ]);
 
-        AppSettings::save($data);
+        AppSettings::save($data, AppSettings::USER, $request->user());
 
         return back()->with('success', 'Settings saved.');
     }

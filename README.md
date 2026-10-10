@@ -1,6 +1,6 @@
 # Just One Post
 
-A self-hosted, single-user social media scheduler. Write one post (text + optional image/video), pick the accounts to publish to, pick a date/time, and the app publishes automatically to **LinkedIn (personal profile), Facebook Pages, Instagram (Business/Creator), YouTube, Threads, X (Twitter), Telegram, Discord and WordPress**. Connect as many accounts of each as you like.
+A self-hosted, multi-user (SaaS-style) social media scheduler: people register, connect their own accounts and schedule posts, and the person who installs it gets an admin panel. Write one post (text + optional image/video), pick the accounts to publish to, pick a date/time, and the app publishes automatically to **LinkedIn (personal profile), Facebook Pages, Instagram (Business/Creator), YouTube, Threads, X (Twitter), Telegram, Discord and WordPress**. Connect as many accounts of each as you like.
 
 * Laravel 12 · PHP 8.2+ · React + Inertia (Breeze) · Vite · MySQL
 * Designed for **shared cPanel hosting**: no queue daemon, no supervisor. One cron line drives everything.
@@ -70,7 +70,7 @@ php artisan key:generate
    ```bash
    php artisan schedule:work
    ```
-6. Log in at http://localhost:8000. Run `php artisan db:seed` once to create the default login `admin@example.com` / `admin123` (re-running it resets that password). Alternatively skip seeding and create your own account at `/register` — registration returns 404 as soon as one user exists. **Change the default password on the Profile page before deploying to a public site.**
+6. Open http://localhost:8000. Registration is open: **the first account you create becomes the admin**. (Or run `php artisan db:seed` to create the default admin `admin@example.com` / `admin123`, re-running resets that password.) **Change that password on the Profile page before deploying to a public site.**
    The in-app **Setup guide** (sidebar, বাংলা + English) walks through creating each developer app step by step.
 7. Put your developer-app credentials in `.env` (below), then go to **Connections**.
 
@@ -122,7 +122,7 @@ One Meta app covers both Facebook Pages and Instagram.
    * `BASE/connections/facebook/callback`
 3. **App settings → Basic**: copy App ID / App Secret → `FACEBOOK_CLIENT_ID` / `FACEBOOK_CLIENT_SECRET`.
 4. Permissions requested by the app: `pages_show_list`, `pages_manage_posts`, `pages_read_engagement`, `instagram_basic`, `instagram_content_publish`.
-   * While the app is in **Development mode** these work for you (as app admin/developer) **without App Review**. That is all a single-user tool needs – do not submit for review.
+   * While the app is in **Development mode** these work for you (as app admin/developer) **without App Review**. That is all a tool needs when each person uses their own developer app (see "Running it as a SaaS") – do not submit for review.
    * If your Page role comes via Business Manager, Meta may additionally require `ads_management`/`ads_read` for Instagram publishing; add them to the scopes in `ConnectionController::redirect()` if you hit a permissions error.
 5. **Instagram:** the account must be a **Business or Creator** account **linked to a Facebook Page** you manage (Instagram → Settings → Account type, then link the Page). On connecting, the app creates one entry per Page and one per linked Instagram account.
 6. In the consent dialog, tick the Pages (and Instagram accounts) you want to grant. Re-connect to add more later.
@@ -181,6 +181,28 @@ One Meta app covers both Facebook Pages and Instagram.
 
 ---
 
+## Running it as a SaaS
+
+**Roles**
+
+* **Users** register themselves (`/register`, rate limited) and get a completely separate workspace: their own connected accounts, posts, uploads and settings. Every query is scoped to the signed-in user (`App\Models\Concerns\BelongsToUser`), so another user's records simply return 404.
+* **Admins** (the first account that registers, or anyone an admin promotes) additionally see an **Admin** section in the sidebar:
+  * **Overview**: user counts, connected accounts per platform, posts by status, 24-hour success/failure counts, publishing-queue size, **scheduler heartbeat** (warns when the cron job stopped) and the latest failures across all users.
+  * **Users**: search, suspend/unsuspend (signs the user out on their next request), promote/demote, **Log in as** (impersonation with a visible banner and an audit log line; not available for other admins or suspended users, and password change / account deletion are blocked while impersonating) and delete (removes the user's accounts, posts and uploaded files).
+  * **App settings**: open/close registration, public base URL, API versions, ffprobe path.
+* There is always at least one admin: the last admin cannot be demoted, suspended or deleted.
+
+**Bring your own keys.** Each user stores their *own* developer-app credentials (Settings page, encrypted) and registers the same redirect URIs in their own LinkedIn/Meta/Google/X/Threads apps; the in-app Setup guide (বাংলা + English) walks them through it. Regular users never fall back to the server's `.env` credentials; the admin (owner of the install) still does. Because every user uses their own app in Development mode, **no platform app review is needed**. Telegram, Discord and WordPress need no developer app at all.
+
+**Workers.** The cron/queue setup is unchanged: one `schedule:run` per minute dispatches due posts for *all* users, and the queue worker applies the owner's credentials per job (config is restored between jobs, so keys never leak between users).
+
+**Before you open it to the public**
+
+* Set up mail (`MAIL_*`) so password-reset e-mails work (the default mailer only logs), and consider requiring e-mail verification.
+* Add your own Terms of Service / Privacy Policy pages, since users hand you OAuth tokens (stored encrypted with `APP_KEY`: back it up).
+* Watch disk usage (uploads live in `storage/app/public/media`) and your host's PHP upload limits.
+* There are no plans, quotas or billing; add them (or close registration) if abuse is a concern.
+
 ## Using the app
 
 * **Connections** – connect/disconnect accounts; shows connection state and token expiry (`needs reconnect`, `expiring`).
@@ -197,6 +219,8 @@ Commands: `php artisan posts:dispatch-due` (queue due posts now), `php artisan a
 * **Threads and Instagram** need a publicly reachable media URL (see "Testing Instagram locally"); text-only Threads posts do not.
 * **Telegram** posts as the channel/bot, not as you; **Discord** posts as the webhook; **WordPress** needs HTTPS for Application Passwords and a REST API that no plugin blocks.
 * One media item per post on every platform.
+* No billing, plans or per-user quotas, and no e-mail verification yet; see "Before you open it to the public".
+* Every user needs their own developer apps (bring your own keys); there is no shared-app mode.
 
 * **Single media item per post** (one image *or* one video). No carousels/multi-image.
 * **Personal LinkedIn profile only** (no Company Pages – that needs `w_organization_social`). LinkedIn commentary is escaped for its "little text" format, so @mentions are not supported; hashtags are posted as plain text.

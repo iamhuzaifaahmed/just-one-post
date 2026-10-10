@@ -112,8 +112,8 @@ class MultiAccountTest extends TestCase
     public function test_post_can_target_many_accounts_of_the_same_platform(): void
     {
         $me = User::factory()->create();
-        $a = SocialAccount::create(['platform' => 'facebook', 'external_id' => '1', 'display_name' => 'Page A', 'access_token' => 't']);
-        $b = SocialAccount::create(['platform' => 'facebook', 'external_id' => '2', 'display_name' => 'Page B', 'access_token' => 't']);
+        $a = SocialAccount::create(['user_id' => $me->id, 'platform' => 'facebook', 'external_id' => '1', 'display_name' => 'Page A', 'access_token' => 't']);
+        $b = SocialAccount::create(['user_id' => $me->id, 'platform' => 'facebook', 'external_id' => '2', 'display_name' => 'Page B', 'access_token' => 't']);
 
         \Illuminate\Support\Facades\Queue::fake();
         $this->actingAs($me)->post('/posts', [

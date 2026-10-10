@@ -132,8 +132,14 @@ class PostService
             throw ValidationException::withMessages(['targets' => 'Select at least one account to publish to.']);
         }
 
+        // Accounts of other users are invisible (tenant scope), so a foreign id simply is not found.
+        $found = SocialAccount::whereIn('id', array_keys($targets))->get();
+        if ($found->count() !== count($targets)) {
+            throw ValidationException::withMessages(['targets' => 'One of the selected accounts does not exist.']);
+        }
+
         $errors = [];
-        foreach (SocialAccount::whereIn('id', array_keys($targets))->get() as $account) {
+        foreach ($found as $account) {
             if ($account->needsReconnect()) {
                 $errors[] = "{$account->display_name} needs to be reconnected first.";
             }

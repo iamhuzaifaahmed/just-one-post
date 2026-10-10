@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\SocialAccount;
+use App\Services\AppSettings;
 use App\Services\Publishers\PublishException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
@@ -36,6 +37,10 @@ class TokenManager
 
             return;
         }
+
+        // Refreshing uses the owner's own developer-app credentials, also inside queue workers
+        // that handle many users one after another.
+        AppSettings::applyForUser($account->user);
 
         $this->refresh($account);
     }
