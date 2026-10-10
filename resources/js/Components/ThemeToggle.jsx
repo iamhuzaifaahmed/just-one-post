@@ -1,6 +1,8 @@
 import Icon from '@/Components/Icon';
 import { useEffect, useState } from 'react';
 
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 /** Sun / moon switch. The choice is saved in this browser; the first visit follows the system. */
 export default function ThemeToggle({ className = '' }) {
     const [dark, setDark] = useState(() => (typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false));
@@ -12,7 +14,7 @@ export default function ThemeToggle({ className = '' }) {
         return () => window.removeEventListener('storage', sync);
     }, []);
 
-    const choose = (isDark) => {
+    const apply = (isDark) => {
         document.documentElement.classList.toggle('dark', isDark);
         try {
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
@@ -22,10 +24,44 @@ export default function ThemeToggle({ className = '' }) {
         setDark(isDark);
     };
 
+    const choose = (isDark, event) => {
+        if (isDark === dark) return;
+
+        if (reducedMotion()) {
+            apply(isDark);
+            return;
+        }
+
+        // Modern browsers: a circle grows from the button and reveals the new theme.
+        if (document.startViewTransition) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+
+            const transition = document.startViewTransition(() => apply(isDark));
+            transition.ready
+                .then(() => {
+                    document.documentElement.animate(
+                        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+                        { duration: 550, easing: 'cubic-bezier(.4,0,.2,1)', pseudoElement: '::view-transition-new(root)' },
+                    );
+                })
+                .catch(() => {});
+            return;
+        }
+
+        // Other browsers: fade colours smoothly for a moment.
+        const root = document.documentElement;
+        root.classList.add('theme-fade');
+        apply(isDark);
+        setTimeout(() => root.classList.remove('theme-fade'), 450);
+    };
+
     const item = (isDark, icon, label) => (
         <button
             type="button"
-            onClick={() => choose(isDark)}
+            onClick={(e) => choose(isDark, e)}
             aria-label={label}
             aria-pressed={dark === isDark}
             className={

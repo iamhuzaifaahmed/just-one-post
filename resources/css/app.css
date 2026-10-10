@@ -108,3 +108,26 @@
         transition-duration: 0.01ms !important;
     }
 }
+
+/* Theme switch animation.
+   Browsers with View Transitions: the new theme is revealed by a circle that grows from the toggle
+   (the circle itself is animated in ThemeToggle.jsx). The default cross-fade must be switched off. */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+    z-index: 1;
+}
+::view-transition-new(root) {
+    z-index: 2;
+}
+
+/* Fallback for other browsers: colours fade for a moment while the class changes. */
+html.theme-fade,
+html.theme-fade *,
+html.theme-fade *::before,
+html.theme-fade *::after {
+    transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease, fill 0.35s ease, box-shadow 0.35s ease !important;
+}
