@@ -7,6 +7,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { MoreBn, MoreEn } from './More';
+import { DiscordBn, DiscordEn, TelegramBn, TelegramEn, ThreadsBn, ThreadsEn, WordPressBn, WordPressEn, XBn, XEn } from './Platforms';
 import { FixBn, LinkedInBn, LiveBn, MetaBn, PublicBn, StartHereBn, YouTubeBn } from './Bn';
 
 const TABS = [
@@ -14,6 +15,11 @@ const TABS = [
     { id: 'linkedin', en: 'LinkedIn', bn: 'LinkedIn', icon: <PlatformIcon platform="linkedin" size="sm" /> },
     { id: 'meta', en: 'Facebook & Instagram', bn: 'Facebook ও Instagram', icon: <PlatformIcon platform="facebook" size="sm" /> },
     { id: 'youtube', en: 'YouTube', bn: 'YouTube', icon: <PlatformIcon platform="youtube" size="sm" /> },
+    { id: 'threads', en: 'Threads', bn: 'Threads', icon: <PlatformIcon platform="threads" size="sm" /> },
+    { id: 'x', en: 'X (Twitter)', bn: 'X (Twitter)', icon: <PlatformIcon platform="x" size="sm" /> },
+    { id: 'telegram', en: 'Telegram', bn: 'Telegram', icon: <PlatformIcon platform="telegram" size="sm" /> },
+    { id: 'discord', en: 'Discord', bn: 'Discord', icon: <PlatformIcon platform="discord" size="sm" /> },
+    { id: 'wordpress', en: 'WordPress', bn: 'WordPress', icon: <PlatformIcon platform="wordpress" size="sm" /> },
     { id: 'more', en: 'Add more accounts', bn: 'আরও অ্যাকাউন্ট যোগ করুন', icon: <Icon name="plus" className="h-5 w-5" /> },
     { id: 'public', en: 'Instagram public link', bn: 'Instagram পাবলিক লিংক', icon: <Icon name="globe" className="h-5 w-5" /> },
     { id: 'live', en: 'Put it on your website', bn: 'ওয়েবসাইটে চালু করুন', icon: <Icon name="upload" className="h-5 w-5" /> },
@@ -66,6 +72,11 @@ function StartHere({ setTab }) {
                         ['linkedin', ['linkedin'], 'LinkedIn', 'Post on your personal profile.', '~15 min'],
                         ['meta', ['facebook', 'instagram'], 'Facebook Page & Instagram', 'Needs a Facebook Page. Instagram must be a Business or Creator account.', '~25 min'],
                         ['youtube', ['youtube'], 'YouTube', 'Upload videos to your channel.', '~20 min'],
+                        ['threads', ['threads'], 'Threads', 'Text, image and video posts. Needs a Meta developer app.', '~20 min'],
+                        ['x', ['x'], 'X (Twitter)', 'Needs a developer app and credits (X charges per post).', '~25 min'],
+                        ['telegram', ['telegram'], 'Telegram', 'Post to a channel or group with your own bot. No developer app.', '~10 min'],
+                        ['discord', ['discord'], 'Discord', 'Post to a channel with a webhook link. The easiest one.', '~3 min'],
+                        ['wordpress', ['wordpress'], 'WordPress', 'Publish blog posts with an Application Password.', '~5 min'],
                     ].map(([id, icons, t, d, time]) => (
                         <button
                             key={id}
@@ -696,6 +707,8 @@ function LiveGuide({ redirects }) {
                         <CopyField label="LinkedIn" value={redirects.linkedin} />
                         <CopyField label="Facebook / Instagram (Meta)" value={redirects.facebook} />
                         <CopyField label="YouTube (Google)" value={redirects.youtube} />
+                        <CopyField label="Threads" value={redirects.threads} />
+                        <CopyField label="X (Twitter)" value={redirects.x} />
                     </div>
                 </Step>
                 <Step title="Add them on each platform (do not delete the old ones)">
@@ -883,6 +896,11 @@ export default function Index({ tab, appUrl, isLocal, redirects, publicBaseUrl }
         linkedin: bn ? <LinkedInBn redirects={redirects} /> : <LinkedInGuide redirects={redirects} />,
         meta: bn ? <MetaBn redirects={redirects} /> : <MetaGuide redirects={redirects} />,
         youtube: bn ? <YouTubeBn redirects={redirects} /> : <YouTubeGuide redirects={redirects} />,
+        threads: bn ? <ThreadsBn redirects={redirects} /> : <ThreadsEn redirects={redirects} />,
+        x: bn ? <XBn redirects={redirects} /> : <XEn redirects={redirects} />,
+        telegram: bn ? <TelegramBn /> : <TelegramEn />,
+        discord: bn ? <DiscordBn /> : <DiscordEn />,
+        wordpress: bn ? <WordPressBn /> : <WordPressEn />,
         more: bn ? <MoreBn /> : <MoreEn />,
         public: bn ? (
             <PublicBn isLocal={isLocal} publicBaseUrl={publicBaseUrl} appUrl={appUrl} />

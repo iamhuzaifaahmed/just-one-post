@@ -18,10 +18,20 @@ trait MakesPosts
                 'facebook' => '1111',
                 'instagram' => '17841400000',
                 'youtube' => 'UCchannel',
+                'telegram' => '-1001234567890',
+                'discord' => '555000111',
+                'threads' => '90001',
+                'x' => '2244994945',
+                'wordpress' => 'blog.example.com#7',
             },
             'display_name' => ucfirst($platform).' test',
             'access_token' => 'secret-access-token',
             'status' => 'active',
+            'meta' => match ($platform) {
+                'telegram' => ['chat_id' => '-1001234567890'],
+                'wordpress' => ['site_url' => 'https://blog.example.com', 'username' => 'editor'],
+                default => null,
+            },
         ], $attrs));
     }
 

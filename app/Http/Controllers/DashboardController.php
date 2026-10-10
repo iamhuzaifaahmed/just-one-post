@@ -36,7 +36,7 @@ class DashboardController extends Controller
                 'body' => str($t->post->body ?? '')->limit(60)->toString(),
             ]);
 
-        $credentials = collect(['linkedin-openid', 'facebook', 'google'])->contains(
+        $credentials = collect(['linkedin-openid', 'facebook', 'google', 'threads', 'x'])->contains(
             fn ($d) => filled(config("services.$d.client_id")) && ! str_starts_with((string) config("services.$d.client_id"), 'your-')
         );
 

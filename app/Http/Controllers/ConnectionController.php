@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Socialite\Facades\Socialite;
@@ -19,6 +20,8 @@ class ConnectionController extends Controller
         'linkedin' => 'linkedin-openid',
         'facebook' => 'facebook',
         'youtube' => 'google',
+        'threads' => 'threads', // custom OAuth (no Socialite driver); key into config/services.php
+        'x' => 'x',
     ];
 
     public function index(): Response
@@ -34,13 +37,18 @@ class ConnectionController extends Controller
                 'status_message' => $a->status_message,
                 'token_state' => $a->tokenState(),
                 'token_expires_at' => $a->token_expires_at?->timezone(config('social.display_timezone'))->format('Y-m-d H:i'),
-                'has_refresh_token' => (bool) $a->refresh_token,
+                'has_refresh_token' => $a->canAutoRefresh(),
             ]);
 
         $configured = [];
         foreach (self::DRIVERS as $platform => $driver) {
             $id = config("services.$driver.client_id");
             $configured[$platform] = filled($id) && ! str_starts_with((string) $id, 'your-');
+        }
+
+        // Telegram, Discord and WordPress need no developer app: they are connected with a token/URL/password.
+        foreach (['telegram', 'discord', 'wordpress'] as $manual) {
+            $configured[$manual] = true;
         }
 
         return Inertia::render('Connections/Index', [
@@ -51,6 +59,10 @@ class ConnectionController extends Controller
 
     public function redirect(string $platform)
     {
+        if ($platform === 'threads') {
+            return $this->threadsRedirect();
+        }
+
         $provider = Socialite::driver(self::DRIVERS[$platform]);
 
         return match ($platform) {
@@ -64,6 +76,8 @@ class ConnectionController extends Controller
                 'https://www.googleapis.com/auth/youtube.upload',
                 'https://www.googleapis.com/auth/youtube.readonly',
             ])->with(['access_type' => 'offline', 'prompt' => 'select_account consent'])->redirect(),
+            // Replace Socialite's default scopes (users.email needs extra app permission).
+            'x' => $provider->setScopes(['tweet.read', 'tweet.write', 'users.read', 'offline.access', 'media.write'])->redirect(),
         };
     }
 
@@ -75,6 +89,12 @@ class ConnectionController extends Controller
         }
 
         try {
+            if ($platform === 'threads') {
+                $count = $this->saveThreads($request);
+
+                return redirect()->route('connections.index')->with('success', "Connected $count account(s) from threads.");
+            }
+
             $user = match ($platform) {
                 'facebook' => Socialite::driver('facebook')->usingGraphVersion(config('social.graph_version'))->user(),
                 default => Socialite::driver(self::DRIVERS[$platform])->user(),
@@ -84,6 +104,7 @@ class ConnectionController extends Controller
                 'linkedin' => $this->saveLinkedIn($user),
                 'facebook' => $this->saveFacebook($user),
                 'youtube' => $this->saveYouTube($user),
+                'x' => $this->saveX($user),
             };
         } catch (Throwable $e) {
             // Never log tokens: only the class and message of the failure.
@@ -108,6 +129,78 @@ class ConnectionController extends Controller
         $account->delete();
 
         return redirect()->route('connections.index')->with('success', 'Account disconnected.');
+    }
+
+    private function threadsRedirect(): RedirectResponse
+    {
+        $state = Str::random(40);
+        session(['threads_oauth_state' => $state]);
+
+        $query = http_build_query([
+            'client_id' => config('services.threads.client_id'),
+            'redirect_uri' => config('services.threads.redirect'),
+            'scope' => 'threads_basic,threads_content_publish',
+            'response_type' => 'code',
+            'state' => $state,
+        ]);
+
+        return redirect()->away(config('social.threads_auth_url').'?'.$query);
+    }
+
+    /** Threads OAuth: code -> short-lived token -> long-lived token (60 days) -> profile. */
+    private function saveThreads(Request $request): int
+    {
+        $expected = (string) session()->pull('threads_oauth_state');
+        if ($expected === '' || ! hash_equals($expected, (string) $request->input('state'))) {
+            throw new RuntimeException('The Threads login expired or was tampered with. Please press Connect again.');
+        }
+
+        $base = rtrim(config('social.threads_api_base'), '/');
+
+        $short = Http::asForm()->post("$base/oauth/access_token", [
+            'client_id' => config('services.threads.client_id'),
+            'client_secret' => config('services.threads.client_secret'),
+            'grant_type' => 'authorization_code',
+            'redirect_uri' => config('services.threads.redirect'),
+            'code' => (string) $request->input('code'),
+        ]);
+        if (! $short->successful() || ! $short->json('access_token')) {
+            throw new RuntimeException('Threads token exchange failed: '.($short->json('error_message') ?? $short->json('error.message') ?? $short->status()));
+        }
+
+        $token = $short->json('access_token');
+        $userId = (string) $short->json('user_id');
+        $expires = 3600;
+
+        $long = Http::get("$base/access_token", [
+            'grant_type' => 'th_exchange_token',
+            'client_secret' => config('services.threads.client_secret'),
+            'access_token' => $token,
+        ]);
+        if ($long->successful() && $long->json('access_token')) {
+            $token = $long->json('access_token');
+            $expires = (int) $long->json('expires_in', 5184000);
+        }
+
+        $me = Http::get("$base/v1.0/me", ['fields' => 'id,username,name', 'access_token' => $token]);
+        $username = $me->json('username') ?: $userId;
+        if (! $me->successful() && $userId === '') {
+            throw new RuntimeException('Could not read your Threads profile: '.($me->json('error.message') ?? $me->status()));
+        }
+
+        $this->saveRaw('threads', $userId ?: (string) $me->json('id'), '@'.$username, $token, null, now()->addSeconds($expires), [
+            'user_id' => $userId ?: $me->json('id'), 'username' => $username,
+        ]);
+
+        return 1;
+    }
+
+    private function saveX($user): int
+    {
+        $handle = $user->getNickname() ?: $user->getName() ?: (string) $user->getId();
+        $this->upsert('x', (string) $user->getId(), '@'.$handle, $user, ['username' => $handle]);
+
+        return 1;
     }
 
     private function saveLinkedIn($user): int

@@ -183,6 +183,13 @@ class PostService
 
     private function cleanOverrides(string $platform, array $overrides): array
     {
+        if ($platform === 'wordpress') {
+            return array_filter([
+                'title' => $overrides['title'] ?? null,
+                'status' => in_array($overrides['status'] ?? null, ['publish', 'draft', 'pending'], true) ? $overrides['status'] : 'publish',
+            ], fn ($v) => $v !== null && $v !== '');
+        }
+
         if ($platform !== 'youtube') {
             return [];
         }

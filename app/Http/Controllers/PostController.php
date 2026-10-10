@@ -98,6 +98,7 @@ class PostController extends Controller
             'targets.*.title' => ['nullable', 'string', 'max:200'],
             'targets.*.description' => ['nullable', 'string', 'max:6000'],
             'targets.*.privacy' => ['nullable', 'in:private,unlisted,public'],
+            'targets.*.status' => ['nullable', 'in:publish,draft,pending'],
             'targets.*.native_schedule' => ['nullable', 'boolean'],
             'media' => ['nullable', 'file', 'mimetypes:image/jpeg,image/png,image/gif,image/webp,video/mp4,video/quicktime,video/webm', 'max:'.(int) config('social.upload_max_kb', 1024 * 1024)],
         ], [
@@ -130,6 +131,11 @@ class PostController extends Controller
                 'facebook' => config('social.limits.facebook.text'),
                 'instagram' => config('social.limits.instagram.text'),
                 'youtube' => config('social.limits.youtube.description_bytes'),
+                'telegram' => config('social.limits.telegram.text'),
+                'discord' => config('social.limits.discord.text'),
+                'threads' => config('social.limits.threads.text'),
+                'x' => config('social.limits.x.text'),
+                'wordpress' => null,
             ],
         ];
     }

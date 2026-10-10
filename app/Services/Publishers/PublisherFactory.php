@@ -11,6 +11,11 @@ class PublisherFactory
             'facebook' => new FacebookPublisher,
             'instagram' => new InstagramPublisher,
             'youtube' => new YouTubePublisher,
+            'telegram' => new TelegramPublisher,
+            'discord' => new DiscordPublisher,
+            'threads' => new ThreadsPublisher,
+            'x' => new XPublisher,
+            'wordpress' => new WordPressPublisher,
             default => throw PublishException::permanent("Unsupported platform: $platform"),
         };
     }

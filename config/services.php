@@ -53,4 +53,18 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    // Threads uses its own app id/secret (shown in the Meta app under the Threads use case).
+    'threads' => [
+        'client_id' => env('THREADS_CLIENT_ID'),
+        'client_secret' => env('THREADS_CLIENT_SECRET'),
+        'redirect' => env('THREADS_REDIRECT_URI'),
+    ],
+
+    // X (Twitter) OAuth 2.0 client; Socialite's "x" driver reads this key.
+    'x' => [
+        'client_id' => env('X_CLIENT_ID'),
+        'client_secret' => env('X_CLIENT_SECRET'),
+        'redirect' => env('X_REDIRECT_URI'),
+    ],
+
 ];

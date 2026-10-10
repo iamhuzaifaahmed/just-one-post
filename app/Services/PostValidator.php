@@ -98,6 +98,99 @@ class PostValidator
                     $errors[] = "$label: video is ".round($mb)." MB; limit is {$limits['video_mb']} MB.";
                 }
                 break;
+
+            case 'telegram':
+                if ($body === '' && ! $type) {
+                    $errors[] = "$label: add text or media.";
+                }
+                // With media the text is a caption (<= 1024) or is sent as a second message (<= 4096).
+                if (mb_strlen($body) > $limits['text']) {
+                    $errors[] = "$label: text is ".mb_strlen($body)." characters; the limit is {$limits['text']}.";
+                }
+                if ($type === 'image' && $mb > $limits['image_mb']) {
+                    $errors[] = "$label: photo is ".round($mb, 1)." MB; Telegram bots allow {$limits['image_mb']} MB.";
+                }
+                if ($type === 'video' && $mb > $limits['video_mb']) {
+                    $errors[] = "$label: video is ".round($mb)." MB; Telegram bots can upload up to {$limits['video_mb']} MB.";
+                }
+                break;
+
+            case 'discord':
+                if ($body === '' && ! $type) {
+                    $errors[] = "$label: add text or media.";
+                }
+                if (mb_strlen($body) > $limits['text']) {
+                    $errors[] = "$label: text is ".mb_strlen($body)." characters; Discord allows {$limits['text']}.";
+                }
+                if ($type && $mb > $limits['file_mb']) {
+                    $errors[] = "$label: file is ".round($mb, 1)." MB; the safe limit is {$limits['file_mb']} MB (raise discord.file_mb in config/social.php for boosted servers).";
+                }
+                break;
+
+            case 'threads':
+                if ($body === '' && ! $type) {
+                    $errors[] = "$label: add text or media.";
+                }
+                if (mb_strlen($body) > $limits['text']) {
+                    $errors[] = "$label: text is ".mb_strlen($body)." characters; Threads allows {$limits['text']}.";
+                }
+                if (preg_match_all('~https?://\S+~i', $body) > $limits['links']) {
+                    $errors[] = "$label: more than {$limits['links']} links.";
+                }
+                if ($type === 'image') {
+                    if ($post->media_mime && ! in_array($post->media_mime, ['image/jpeg', 'image/png'], true)) {
+                        $errors[] = "$label: images must be JPEG or PNG (got {$post->media_mime}).";
+                    }
+                    if ($mb > $limits['image_mb']) {
+                        $errors[] = "$label: image is ".round($mb, 1)." MB; limit is {$limits['image_mb']} MB.";
+                    }
+                }
+                if ($type === 'video') {
+                    if ($post->media_mime && ! in_array($post->media_mime, ['video/mp4', 'video/quicktime'], true)) {
+                        $errors[] = "$label: videos must be MP4 or MOV (got {$post->media_mime}).";
+                    }
+                    if ($mb > $limits['video_mb']) {
+                        $errors[] = "$label: video is ".round($mb)." MB; limit is {$limits['video_mb']} MB.";
+                    }
+                    $errors = array_merge($errors, $this->duration($label, $info, $limits['video_seconds']));
+                }
+                break;
+
+            case 'x':
+                if ($body === '' && ! $type) {
+                    $errors[] = "$label: add text or media.";
+                }
+                // X counts every URL as a fixed length, whatever its real length.
+                $weighted = mb_strlen(preg_replace('~https?://\S+~i', str_repeat('x', (int) $limits['url_length']), $body));
+                if ($weighted > $limits['text']) {
+                    $errors[] = "$label: post is $weighted characters (links count as {$limits['url_length']}); the limit is {$limits['text']}.";
+                }
+                if ($type === 'image' && $mb > $limits['image_mb']) {
+                    $errors[] = "$label: image is ".round($mb, 1)." MB; limit is {$limits['image_mb']} MB.";
+                }
+                if ($type === 'video') {
+                    if ($mb > $limits['video_mb']) {
+                        $errors[] = "$label: video is ".round($mb)." MB; limit is {$limits['video_mb']} MB.";
+                    }
+                    $errors = array_merge($errors, $this->duration($label, $info, $limits['video_seconds']));
+                }
+                break;
+
+            case 'wordpress':
+                if ($body === '' && ! $type) {
+                    $errors[] = "$label: add text or media.";
+                }
+                $title = trim((string) ($overrides['title'] ?? strtok($body, "\n") ?: ''));
+                if (mb_strlen($title) > $limits['title']) {
+                    $errors[] = "$label: title exceeds {$limits['title']} characters.";
+                }
+                if (isset($overrides['status']) && ! in_array($overrides['status'], ['publish', 'draft', 'pending'], true)) {
+                    $errors[] = "$label: status must be publish, draft or pending.";
+                }
+                if ($type && $mb > $limits['media_mb']) {
+                    $errors[] = "$label: file is ".round($mb)." MB; limit is {$limits['media_mb']} MB (also check your site's upload_max_filesize).";
+                }
+                break;
         }
 
         return $errors;

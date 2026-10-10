@@ -1,6 +1,6 @@
 # Just One Post
 
-A self-hosted, single-user social media scheduler. Write one post (text + optional image/video), pick the accounts to publish to, pick a date/time, and the app publishes automatically to **LinkedIn (personal profile), Facebook Pages, Instagram (Business/Creator) and YouTube**.
+A self-hosted, single-user social media scheduler. Write one post (text + optional image/video), pick the accounts to publish to, pick a date/time, and the app publishes automatically to **LinkedIn (personal profile), Facebook Pages, Instagram (Business/Creator), YouTube, Threads, X (Twitter), Telegram, Discord and WordPress**. Connect as many accounts of each as you like.
 
 * Laravel 12 · PHP 8.2+ · React + Inertia (Breeze) · Vite · MySQL
 * Designed for **shared cPanel hosting**: no queue daemon, no supervisor. One cron line drives everything.
@@ -31,6 +31,11 @@ cron (every minute) ─► php artisan schedule:run
 | Facebook | Graph API `v25.0` (`META_GRAPH_VERSION`): `/{page}/feed`, `/photos`, `/videos` (graph-video host) | Posts as the Page using the Page access token. |
 | Instagram | Graph `v25.0`: `/{ig-id}/media` → poll `status_code` → `/{ig-id}/media_publish` | Image must be **JPEG**; video is published as a **Reel**. Media URL must be public (see below). Limit: 100 API posts / 24h. |
 | YouTube | Data API v3 resumable upload (`videos.insert`) | ~1,600 quota units per upload (default 10,000/day ≈ 6 uploads/day). Optional "native schedule": upload now as private + `status.publishAt`. |
+| Threads | Threads API `graph.threads.net/v1.0`: container → `threads_publish` (OAuth, scopes `threads_basic`, `threads_content_publish`) | Own Threads App ID/Secret (Meta app → Threads use case), you must be a Threads tester while the app is in Development mode. Media needs a public URL. 500 chars, 60-day token auto-refreshed. |
+| X (Twitter) | API v2 `POST /2/tweets` + chunked `/2/media/upload` (OAuth 2.0, scopes `tweet.read tweet.write users.read offline.access media.write`) | **Pay-per-use**: X bills each created post (reported ≈ $0.015, ≈ $0.20 with a link; verify in your console). 280 weighted chars. Refresh tokens rotate. |
+| Telegram | Bot API `sendMessage` / `sendPhoto` / `sendVideo` | Bot token + channel/group; the bot must be channel admin. Caption ≤ 1024, text ≤ 4096, video ≤ 50 MB. No developer app. |
+| Discord | Webhook `POST /webhooks/{id}/{token}?wait=true` | Webhook URL per channel (stored encrypted). `@everyone`/role pings are disabled. Text ≤ 2000, files ≤ 10 MB by default. |
+| WordPress | REST API `/wp-json/wp/v2/posts` + `/media` | Self-hosted WordPress ≥ 5.6 over HTTPS with an Application Password. Image = featured image, video embedded. |
 
 ---
 
@@ -90,6 +95,8 @@ PUBLIC_BASE_URL=https://your-tunnel-subdomain.ngrok-free.app
 Media is served from `PUBLIC_BASE_URL/storage/...`, so `php artisan storage:link` must have been run. On cPanel just leave `PUBLIC_BASE_URL` empty (it falls back to `APP_URL`). Use the tunnel URL only for Instagram testing; log in via `localhost` as usual.
 
 ---
+
+> **Easier:** the in-app **Setup guide** (sidebar, বাংলা + English) walks through every platform below *and* Threads, X, Telegram, Discord and WordPress click by click. Telegram, Discord and WordPress need no developer app at all: connect them from the Connections page. Threads and X redirect URIs are `BASE/connections/threads/callback` and `BASE/connections/x/callback`.
 
 ## Creating the developer apps
 
@@ -185,6 +192,11 @@ Commands: `php artisan posts:dispatch-due` (queue due posts now), `php artisan a
 ---
 
 ## Known limitations
+
+* **X is not free**: its API is pay-per-use, so every post costs money and credits must be bought in the X developer console.
+* **Threads and Instagram** need a publicly reachable media URL (see "Testing Instagram locally"); text-only Threads posts do not.
+* **Telegram** posts as the channel/bot, not as you; **Discord** posts as the webhook; **WordPress** needs HTTPS for Application Passwords and a REST API that no plugin blocks.
+* One media item per post on every platform.
 
 * **Single media item per post** (one image *or* one video). No carousels/multi-image.
 * **Personal LinkedIn profile only** (no Company Pages – that needs `w_organization_social`). LinkedIn commentary is escaped for its "little text" format, so @mentions are not supported; hashtags are posted as plain text.

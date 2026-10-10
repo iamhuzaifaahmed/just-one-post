@@ -3,6 +3,7 @@
 use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuideController;
+use App\Http\Controllers\ManualConnectionController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
@@ -15,9 +16,12 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/connections', [ConnectionController::class, 'index'])->name('connections.index');
     Route::get('/connections/{platform}/redirect', [ConnectionController::class, 'redirect'])
-        ->whereIn('platform', ['linkedin', 'facebook', 'youtube'])->name('connections.redirect');
+        ->whereIn('platform', ['linkedin', 'facebook', 'youtube', 'threads', 'x'])->name('connections.redirect');
     Route::get('/connections/{platform}/callback', [ConnectionController::class, 'callback'])
-        ->whereIn('platform', ['linkedin', 'facebook', 'youtube'])->name('connections.callback');
+        ->whereIn('platform', ['linkedin', 'facebook', 'youtube', 'threads', 'x'])->name('connections.callback');
+    Route::post('/connections/telegram', [ManualConnectionController::class, 'telegram'])->name('connections.telegram');
+    Route::post('/connections/discord', [ManualConnectionController::class, 'discord'])->name('connections.discord');
+    Route::post('/connections/wordpress', [ManualConnectionController::class, 'wordpress'])->name('connections.wordpress');
     Route::patch('/connections/{account}', [ConnectionController::class, 'rename'])->name('connections.rename');
     Route::delete('/connections/{account}', [ConnectionController::class, 'destroy'])->name('connections.destroy');
 

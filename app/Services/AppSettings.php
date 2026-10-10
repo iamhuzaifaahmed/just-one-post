@@ -19,7 +19,11 @@ class AppSettings
         'facebook_client_secret' => ['services.facebook.client_secret', true, 'facebook', 'App Secret'],
         'google_client_id' => ['services.google.client_id', false, 'google', 'Client ID'],
         'google_client_secret' => ['services.google.client_secret', true, 'google', 'Client Secret'],
-        'public_base_url' => ['social.public_base_url', false, 'general', 'Public base URL (for Instagram media)'],
+        'threads_client_id' => ['services.threads.client_id', false, 'threads', 'Threads App ID'],
+        'threads_client_secret' => ['services.threads.client_secret', true, 'threads', 'Threads App Secret'],
+        'x_client_id' => ['services.x.client_id', false, 'x', 'Client ID'],
+        'x_client_secret' => ['services.x.client_secret', true, 'x', 'Client Secret'],
+        'public_base_url' => ['social.public_base_url', false, 'general', 'Public base URL (for Instagram and Threads media)'],
         'display_timezone' => ['social.display_timezone', false, 'general', 'Display timezone'],
         'meta_graph_version' => ['social.graph_version', false, 'advanced', 'Meta Graph API version'],
         'linkedin_api_version' => ['social.linkedin_version', false, 'advanced', 'LinkedIn API version (YYYYMM)'],
@@ -31,6 +35,8 @@ class AppSettings
         'services.linkedin-openid.redirect' => '/connections/linkedin/callback',
         'services.facebook.redirect' => '/connections/facebook/callback',
         'services.google.redirect' => '/connections/youtube/callback',
+        'services.threads.redirect' => '/connections/threads/callback',
+        'services.x.redirect' => '/connections/x/callback',
     ];
 
     /** Push saved values into config(). Safe to call before migrations have run. */

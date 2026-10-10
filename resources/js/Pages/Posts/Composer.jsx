@@ -6,7 +6,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-const ORDER = ['linkedin', 'facebook', 'instagram', 'youtube'];
+const ORDER = ['linkedin', 'facebook', 'instagram', 'youtube', 'threads', 'x', 'telegram', 'discord', 'wordpress'];
 const ACCEPT = 'image/jpeg,image/png,image/gif,image/webp,video/mp4,video/quicktime,video/webm';
 
 /* ---- date helpers: "YYYY-MM-DDTHH:mm" strings in the display timezone ---- */
@@ -121,8 +121,13 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
         if (seen.has(a.platform)) return;
         seen.add(a.platform);
         const len = a.platform === 'youtube' ? new Blob([data.body]).size : data.body.length;
-        counters.push({ platform: a.platform, len, max: limits[a.platform], over: len > limits[a.platform] });
-        if (len > limits[a.platform]) warnings.push(`${platforms[a.platform]}: text is over the ${limits[a.platform]} limit.`);
+        if (limits[a.platform]) {
+            counters.push({ platform: a.platform, len, max: limits[a.platform], over: len > limits[a.platform] });
+            if (len > limits[a.platform]) warnings.push(`${platforms[a.platform]}: text is over the ${limits[a.platform]} limit.`);
+        }
+        if (a.platform === 'threads' || a.platform === 'instagram') {
+            if (media && window.location.hostname === 'localhost') warnings.push(`${platforms[a.platform]} downloads media from a public link: set a Public base URL in Settings (see the guide).`);
+        }
         if (a.platform === 'instagram' && !media) warnings.push('Instagram needs an image or a video.');
         if (a.platform === 'youtube' && media?.type !== 'video') warnings.push('YouTube needs a video.');
     });
@@ -343,6 +348,39 @@ export default function Composer({ post, accounts, limits, nowLocal }) {
                                 ))}
                             </ul>
                         )}
+
+                        {selectedAccounts
+                            .filter((a) => a.platform === 'wordpress')
+                            .map((a) => {
+                                const t = data.targets[a.id];
+                                return (
+                                    <div key={a.id} className="mt-5 space-y-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+                                        <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+                                            <PlatformIcon platform="wordpress" size="sm" /> WordPress options · {a.display_name}
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="Post title (defaults to the first line of the text)"
+                                            value={t.title || ''}
+                                            maxLength={200}
+                                            onChange={(e) => setOverride(a.id, 'title', e.target.value)}
+                                            className="input"
+                                        />
+                                        <label className="flex items-center gap-2 text-sm">
+                                            <span className="text-slate-600">Status</span>
+                                            <select
+                                                value={t.status || 'publish'}
+                                                onChange={(e) => setOverride(a.id, 'status', e.target.value)}
+                                                className="input !w-auto !py-1.5"
+                                            >
+                                                <option value="publish">Publish</option>
+                                                <option value="draft">Save as draft</option>
+                                                <option value="pending">Pending review</option>
+                                            </select>
+                                        </label>
+                                    </div>
+                                );
+                            })}
 
                         {selectedAccounts
                             .filter((a) => a.platform === 'youtube')

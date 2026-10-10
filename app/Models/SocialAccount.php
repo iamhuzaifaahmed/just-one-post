@@ -48,6 +48,12 @@ class SocialAccount extends Model
         $this->update(['status' => self::NEEDS_RECONNECT, 'status_message' => mb_substr($reason, 0, 250)]);
     }
 
+    /** Threads refreshes its long-lived token with itself; the others need a stored refresh token. */
+    public function canAutoRefresh(): bool
+    {
+        return filled($this->refresh_token) || $this->platform === 'threads';
+    }
+
     public function tokenExpiresWithin(int $seconds): bool
     {
         return $this->token_expires_at !== null
@@ -63,10 +69,10 @@ class SocialAccount extends Model
         if ($this->token_expires_at === null) {
             return 'ok';
         }
-        if ($this->token_expires_at->isPast() && ! $this->refresh_token) {
+        if ($this->token_expires_at->isPast() && ! $this->canAutoRefresh()) {
             return 'expired';
         }
-        if ($this->token_expires_at->lte(now()->addDays(7)) && ! $this->refresh_token) {
+        if ($this->token_expires_at->lte(now()->addDays(7)) && ! $this->canAutoRefresh()) {
             return 'expiring';
         }
 

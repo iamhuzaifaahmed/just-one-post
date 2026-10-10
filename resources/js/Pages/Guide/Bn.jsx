@@ -59,6 +59,11 @@ export function StartHereBn({ setTab }) {
                         ['linkedin', ['linkedin'], 'LinkedIn', 'আপনার নিজের প্রোফাইলে পোস্ট।', 'প্রায় ১৫ মিনিট'],
                         ['meta', ['facebook', 'instagram'], 'Facebook Page ও Instagram', 'Facebook Page লাগবে। Instagram অবশ্যই Business বা Creator অ্যাকাউন্ট হতে হবে।', 'প্রায় ২৫ মিনিট'],
                         ['youtube', ['youtube'], 'YouTube', 'আপনার চ্যানেলে ভিডিও আপলোড।', 'প্রায় ২০ মিনিট'],
+                        ['threads', ['threads'], 'Threads', 'লেখা, ছবি ও ভিডিও পোস্ট। Meta ডেভেলপার অ্যাপ লাগবে।', 'প্রায় ২০ মিনিট'],
+                        ['x', ['x'], 'X (Twitter)', 'ডেভেলপার অ্যাপ ও ক্রেডিট লাগবে (X প্রতি পোস্টে টাকা নেয়)।', 'প্রায় ২৫ মিনিট'],
+                        ['telegram', ['telegram'], 'Telegram', 'নিজের বট দিয়ে চ্যানেল বা গ্রুপে পোস্ট। ডেভেলপার অ্যাপ লাগে না।', 'প্রায় ১০ মিনিট'],
+                        ['discord', ['discord'], 'Discord', 'webhook লিংক দিয়ে চ্যানেলে পোস্ট। সবচেয়ে সহজ।', 'প্রায় ৩ মিনিট'],
+                        ['wordpress', ['wordpress'], 'WordPress', 'Application Password দিয়ে ব্লগ পোস্ট প্রকাশ।', 'প্রায় ৫ মিনিট'],
                     ].map(([id, icons, t, d, time]) => (
                         <button
                             key={id}
@@ -664,6 +669,8 @@ export function LiveBn({ redirects }) {
                         <CopyField label="LinkedIn" value={redirects.linkedin} />
                         <CopyField label="Facebook / Instagram (Meta)" value={redirects.facebook} />
                         <CopyField label="YouTube (Google)" value={redirects.youtube} />
+                        <CopyField label="Threads" value={redirects.threads} />
+                        <CopyField label="X (Twitter)" value={redirects.x} />
                     </div>
                 </Step>
                 <Step title="প্রতিটি প্ল্যাটফর্মে যোগ করুন (পুরনোগুলো মুছবেন না)">

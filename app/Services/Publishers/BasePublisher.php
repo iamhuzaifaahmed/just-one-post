@@ -57,11 +57,33 @@ abstract class BasePublisher implements Publisher
         $json = $response->json();
         $msg = data_get($json, 'error.message')
             ?? data_get($json, 'error_description')
-            ?? data_get($json, 'message')
+            ?? data_get($json, 'description')   // Telegram
+            ?? data_get($json, 'detail')        // X
+            ?? data_get($json, 'message')       // Discord, WordPress, LinkedIn
             ?? (is_string(data_get($json, 'error')) ? data_get($json, 'error') : null)
             ?? mb_substr($response->body(), 0, 300);
 
         return mb_substr((string) $msg, 0, 400);
+    }
+
+    /**
+     * Media URL that the platform's own servers must be able to download (Instagram, Threads).
+     *
+     * @throws PublishException
+     */
+    protected function publicMediaUrl(\App\Models\Post $post, string $platformLabel): string
+    {
+        $url = $post->mediaPublicUrl();
+        if (! $url) {
+            throw PublishException::permanent("$platformLabel requires an image or a video.");
+        }
+        if (preg_match('#^https?://(localhost|127\.|\[::1\]|[^/:]*\.test)([/:]|$)#i', $url)) {
+            throw PublishException::permanent(
+                "$platformLabel must fetch the media from a public URL, but it is \"$url\". Set the Public base URL in Settings to a tunnel (ngrok/cloudflared) or your live domain."
+            );
+        }
+
+        return $url;
     }
 
     abstract protected function name(): string;

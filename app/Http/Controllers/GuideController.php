@@ -20,6 +20,8 @@ class GuideController extends Controller
                 'linkedin' => url('/connections/linkedin/callback'),
                 'facebook' => url('/connections/facebook/callback'),
                 'youtube' => url('/connections/youtube/callback'),
+                'threads' => url('/connections/threads/callback'),
+                'x' => url('/connections/x/callback'),
             ],
             'publicBaseUrl' => config('social.public_base_url'),
         ]);
